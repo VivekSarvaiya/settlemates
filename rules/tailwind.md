@@ -1,6 +1,6 @@
 # Tailwind & Design System
 
-Assumes `react.md` and `nextjs.md` in this same folder. This file governs styling only. The values referenced below (colors, type scale, radius) are defined in `UIUX-Design-EquiSplit.md` — this file is about *enforcing* them in code, not re-deriving them.
+Assumes `react.md` and `nextjs.md` in this same folder. This file governs styling only. The values referenced below (colors, type scale, radius) are defined in `docs/UIUX-Design.md` — this file is about *enforcing* them in code, not re-deriving them.
 
 ## General
 
@@ -25,7 +25,7 @@ Assumes `react.md` and `nextjs.md` in this same folder. This file governs stylin
 
 ## Color Tokens
 
-Map directly to `UIUX-Design-EquiSplit.md` Section 9 — don't introduce a class or a token that isn't listed there.
+Map directly to `docs/UIUX-Design.md` Section 9 — don't introduce a class or a token that isn't listed there.
 
 | Design token | Tailwind class | Use for |
 |---|---|---|

@@ -30,19 +30,19 @@ Full detail: `agent_docs/tech_stack.md`, `agent_docs/product_requirements.md`, `
 
 ## Setup & Commands
 
-The repository hasn't been scaffolded yet (see Current State). Once it exists, expect the standard Next.js + Prisma conventions below — **treat these as the intended baseline, and update this section with the real scripts the moment `package.json` exists**, rather than assuming they're already accurate:
+The repository is scaffolded (see Current State). Always use pnpm — never npm or yarn:
 
 ```bash
-npm install                # install dependencies
-npm run dev                 # local dev server
-npx prisma migrate dev      # apply schema migrations locally
-npx prisma studio            # inspect local DB
-npm run lint                 # lint
-npm run typecheck            # tsc --noEmit
-npm test                     # Vitest unit/integration tests
-npm run test:coverage        # coverage report
-npm run build                 # production build
-vercel --prod                 # deploy (or via GitHub integration)
+pnpm install                 # install dependencies
+pnpm dev                     # local dev server
+pnpm exec prisma migrate dev # apply schema migrations (once Prisma exists)
+pnpm exec prisma studio      # inspect local DB
+pnpm lint                    # lint
+pnpm exec tsc --noEmit       # typecheck (no "typecheck" script defined)
+pnpm test                    # Vitest domain + component tests
+pnpm run test:coverage       # coverage report (thresholds on the split engine)
+SITE_URL=http://localhost:3000 pnpm build  # production build (SITE_URL is required)
+vercel --prod                # deploy (or via GitHub integration)
 ```
 
 ---
@@ -83,9 +83,185 @@ This project has one area that deserves extra rigor beyond the loop above: **the
 
 ---
 
+## Rules
+
+Before writing or changing any code, read every file in `rules/` — these are
+binding and override general best practice. If the folder does not exist, continue.
+
+### Code Quality
+
+* No unused imports, variables, dead code, commented-out code, or debug statements.
+* Use camelCase for all frontend-owned variables, state, props, and function names.
+* Snake_case is allowed only at the API boundary for backend contract fields.
+* Keep naming consistent with surrounding code.
+
+### UI Consistency
+
+* Avoid conflicting or duplicate Tailwind classes.
+* Follow existing spacing, button, modal, badge, and form patterns.
+* Do not introduce one-off styling patterns without a strong reason.
+* All new pages, components, dialogs, sections, and UI features should be styled using Tailwind CSS.
+* Prefer Tailwind utility classes over custom CSS, SCSS, CSS modules, styled-components, inline styles, or MUI `sx` props.
+* Reuse existing Tailwind patterns and design tokens before introducing new styles.
+* New stylesheet files should not be added unless there is a documented technical requirement that cannot reasonably be implemented with Tailwind.
+
+### Shared UI Components (Design System)
+
+* Always use the shared design-system components from `@src/ui/components/*` instead of raw HTML elements or one-off implementations.
+* **Buttons:** Use the `Button` component (`@src/ui/components/Button`) for every button UI element — actions, submit/cancel, close (✕), and icon-only buttons (`variant="ghost" size="icon-*"`). Do **not** hand-roll `<button className="...">`. For icon-only buttons, render the icon (from `@src/ui/icons`, e.g. `HugeiconsIcon` + `Cancel01Icon`) as the child. Native `<button>` is acceptable only for large clickable surfaces (cards, media thumbnails) where the `Button` variants do not apply.
+* **Modals/Dialogs:** Use the `Dialog` family (`@src/ui/components/Dialog`) — never a custom overlay `<div>`. It handles backdrop/Escape dismissal by default; use `<DialogClose asChild>` around the close `Button`.
+* **Icons:** Import icons from `@src/ui/icons` (HugeIcons) rather than inline glyphs/emoji or raw SVG.
+* Before hand-writing a primitive (button, input, dropdown, badge, tooltip, etc.), check `@src/ui/components` for an existing one and use it.
+
+### Performance
+
+* Avoid unnecessary re-renders.
+* Avoid expensive computations inside render paths.
+* Memoize derived values only when justified by actual render cost.
+
+## Component Structure Convention
+
+All new components must be created in their own folder.
+
+### Required Structure
+
+```txt
+Feature/
+├── Feature.tsx
+├── useFeature.ts
+├── types.ts
+├── const.ts          (optional)
+└── components/
+```
+
+### Responsibilities
+
+#### `Feature.tsx`
+
+* Contains presentation and JSX only.
+* Consumes state, derived values, and handlers from `useFeature.ts`.
+* Should not contain business logic, API calls, selectors, dispatches, or complex state management.
+
+#### `useFeature.ts`
+
+* Contains:
+
+  * `useState`
+  * `useEffect`
+  * `useMemo`
+  * `useCallback`
+  * `useRef`
+  * Redux selectors
+  * Redux dispatches
+  * API calls
+  * Event handlers
+  * Derived values
+* Must return a named object.
+
+Example:
+
+```ts
+return {
+  data,
+  isLoading,
+  selectedItem,
+  handleSave,
+  handleClose,
+};
+```
+
+#### `types.ts`
+
+* All component-specific types, interfaces, enums, and prop definitions must live in this file.
+* Do not declare component props inline inside `Feature.tsx`.
+
+Example:
+
+```ts
+export interface FeatureProps {
+  projectId: string;
+  onClose: () => void;
+}
+
+export interface TableRow {
+  id: string;
+  name: string;
+}
+```
+
+#### `const.ts` (Optional)
+
+* Component-specific constants only.
+
+Example:
+
+```ts
+export const MAX_UPLOAD_COUNT = 50;
+export const DEFAULT_PAGE_SIZE = 25;
+```
+
+### Child Components
+
+Every child component must also follow the same structure.
+
+```txt
+Feature/
+├── Feature.tsx
+├── useFeature.ts
+├── types.ts
+└── components/
+    ├── Header/
+    │   ├── Header.tsx
+    │   ├── useHeader.ts
+    │   ├── types.ts
+    │   └── const.ts
+    │
+    └── Table/
+        ├── Table.tsx
+        ├── useTable.ts
+        ├── types.ts
+        └── const.ts
+    components/index.ts
+
+export { default as Header } from './Header/Header';
+export { default as Table } from './Table/Table';
+Usage
+
+Prefer importing child components through the barrel file:
+
+import { Header, Table } from './components';
+
+instead of:
+
+import Header from './components/Header/Header';
+import Table from './components/Table/Table';
+```
+
+### TypeScript Requirement
+
+* New React components MUST use `.tsx`.
+* New hooks MUST use `.ts`.
+* New utilities, services, constants, and helpers MUST use `.ts`.
+* Do not create new `.js` or `.jsx` files.
+
 ## Current State
 
-**Project setup — nothing built yet.**
+**Phase 1 — Foundation & Setup. Marketing landing page is built; app/auth/DB not started.**
+
+What exists (as of the last session — nothing committed yet, all changes are in the working tree):
+
+- Next.js 16 App Router + Tailwind v4 + shadcn/ui primitives (Base UI) in `components/ui/` — `button`, `card`, `input`, `label`, `separator`, `avatar`, `badge`.
+- Design tokens in `app/globals.css`: `--primary-text`, `--inverse`, plus a marketing-only display type scale (`text-display-md/lg`, `text-lead`) used by landing copy alone — app copy stays on `text-sm/base/lg`.
+- `domains/expenses/split.ts` — the split engine: `computeSplit` for equal / exact / percentage / shares, integer minor units, explicit payer index, typed errors, deterministic remainder distribution. `summarizeEqualSplit` feeds the Quick Split UI. `lib/currency.ts` handles INR parse + format. Treat as settlement-adjacent: test before touching.
+- `domains/expenses/schemas.ts` — `splitInputSchema` (Zod) mirrors the domain rules for API-boundary validation, ready for the expense route handlers.
+- `tests/` + `vitest.config.mts` / `vitest.setup.ts` — Vitest 5 + React Testing Library (jsdom); `test` / `test:coverage` scripts. Domain split coverage is 100% lines, 98% statements.
+- `app/(marketing)/` — `layout.tsx` (Header + Footer + MotionProvider + no-JS reveal fallback) and `page.tsx` (Hero with the interactive `SplitCalculator`, HowItWorks, Features, FAQ), composing components from `app/(marketing)/_components/`.
+- `SplitCalculator` feature: entry → result → customize stages, validation surfaced live via `computeSplit`.
+- Deleted the committed `types/` folder (stale copy of Next's generated route types — it broke `tsc --noEmit`) and gitignored `/types/`; Next regenerates it under `.next/types/`.
+
+Still missing: Supabase/Prisma/Auth wiring, any `(dashboard)` route, CI/CD, an OG image for marketing metadata, and a browser-based visual pass over the landing page.
+
+Last verification: `pnpm test`, `pnpm run test:coverage`, `pnpm exec tsc --noEmit`, `pnpm lint`, and `SITE_URL=http://localhost:3000 pnpm build` all pass. (`pnpm build` without `SITE_URL` fails by design — `config/env.ts` requires it outside dev.)
 
 Update this section every session: what's built, what's in progress, what broke last time. Keep `MEMORY.md` in sync with this.
 
@@ -113,3 +289,13 @@ Shared Living mode, expense categories & activity timeline, basic notifications.
 Receipt upload, QR code invitations, expense comments, dispute handling. Do not start these before Phase 2 and 3 are complete and tested.
 
 Do not reorder phases without discussing it first — Phase 2's feature list matches the PRD's Definition of Done exactly.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

@@ -1,12 +1,12 @@
-# EquiSplit — UI/UX Design Document
+# SettleMates — UI/UX Design Document
 
-This document defines the visual language and interaction rules for EquiSplit's web app. It supersedes the earlier exploratory palette (teal + coral + emerald + rose) from initial design conversation — the direction below reflects the current brief: a single primary color, white background, black text, strict 2-weight/3-size typography, and a calculator-simple feel rather than a data-entry-software feel. Built for the existing stack: Next.js, Tailwind CSS, shadcn/ui.
+This document defines the visual language and interaction rules for the SettleMates web app. It supersedes the earlier exploratory palette (teal + coral + emerald + rose) from initial design conversation — the direction below reflects the current brief: a single primary color, white background, black text, strict 2-weight/3-size typography, and a calculator-simple feel rather than a data-entry-software feel. Built for the existing stack: Next.js, Tailwind CSS, shadcn/ui.
 
 ---
 
 ## 1. Design Philosophy
 
-The category already has established players with the same feature set — group expenses, splitting, settlement. EquiSplit doesn't win on features; it wins on **how little thinking it requires to use.**
+The category already has established players with the same feature set — group expenses, splitting, settlement. SettleMates doesn't win on features; it wins on **how little thinking it requires to use.**
 
 The benchmark isn't other expense apps. It's a calculator, or a clean spreadsheet with room to breathe. Both are tools people trust *because* they're simple: you know exactly where to look, exactly what to enter, and exactly what the number means. That's the standard every screen in this app is held to — not "does it look modern," but "could someone use this correctly without reading anything."
 
@@ -28,7 +28,7 @@ The benchmark isn't other expense apps. It's a calculator, or a clean spreadshee
 |---|---|---|
 | Destructive | text-destructive | shadcn's standard destructive variant — delete expense, remove member, revoke invite — **and** reused for "you owe" balance amounts |
 
-This is the one deliberate compromise on "single primary color": shadcn ships a destructive red regardless, because delete actions need one. Rather than adding a second brand hue for the "you owe" state, EquiSplit reuses that same red. "You're owed" reuses the primary teal itself. Net result: **two colors do all the work, and neither exists solely for decoration.**
+This is the one deliberate compromise on "single primary color": shadcn ships a destructive red regardless, because delete actions need one. Rather than adding a second brand hue for the "you owe" state, SettleMates reuses that same red. "You're owed" reuses the primary teal itself. Net result: **two colors do all the work, and neither exists solely for decoration.**
 
 **If you'd rather go fully monochrome:** drop color from balance amounts entirely and rely on a `+`/`−` prefix plus weight (e.g., medium weight for owed-to-you, same weight but a "you owe" label above it) instead of color. It's more restrained but asks slightly more of the eye at a glance. Worth testing both with a few real users before locking it in — flagging this as a genuine open choice, not a settled one.
 

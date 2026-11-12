@@ -39,6 +39,18 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-primary-text: var(--primary-text);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --color-inverse: var(--inverse);
+  /* Marketing type scale — landing-page display sizes only; app copy stays on text-sm/base/lg */
+  --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+  --text-display-md: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  --text-display-md--line-height: 1.15;
+  --text-display-md--letter-spacing: -0.015em;
+  --text-display-lg: clamp(2.5rem, 1.75rem + 3vw, 4.25rem);
+  --text-display-lg--line-height: 1.03;
+  --text-display-lg--letter-spacing: -0.025em;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -57,6 +69,9 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.511 0.096 186.391);
   --primary-foreground: oklch(0.984 0.014 180.72);
+  --primary-text: oklch(0.511 0.096 186.391);
+  --inverse: oklch(0.165 0.012 205);
+  --inverse-foreground: oklch(0.985 0.005 205);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.97 0 0);
@@ -92,6 +107,7 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.437 0.078 188.216);
   --primary-foreground: oklch(0.984 0.014 180.72);
+  --primary-text: oklch(0.437 0.078 188.216);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -126,5 +142,10 @@
   }
   html {
     @apply font-sans;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
