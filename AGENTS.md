@@ -30,19 +30,19 @@ Full detail: `agent_docs/tech_stack.md`, `agent_docs/product_requirements.md`, `
 
 ## Setup & Commands
 
-The repository hasn't been scaffolded yet (see Current State). Once it exists, expect the standard Next.js + Prisma conventions below — **treat these as the intended baseline, and update this section with the real scripts the moment `package.json` exists**, rather than assuming they're already accurate:
+The repository is scaffolded (see Current State). Always use pnpm — never npm or yarn:
 
 ```bash
-npm install                # install dependencies
-npm run dev                 # local dev server
-npx prisma migrate dev      # apply schema migrations locally
-npx prisma studio            # inspect local DB
-npm run lint                 # lint
-npm run typecheck            # tsc --noEmit
-npm test                     # Vitest unit/integration tests
-npm run test:coverage        # coverage report
-npm run build                 # production build
-vercel --prod                 # deploy (or via GitHub integration)
+pnpm install                 # install dependencies
+pnpm dev                     # local dev server
+pnpm exec prisma migrate dev # apply schema migrations (once Prisma exists)
+pnpm exec prisma studio      # inspect local DB
+pnpm lint                    # lint
+pnpm exec tsc --noEmit       # typecheck (no "typecheck" script defined)
+pnpm test                    # Vitest domain + component tests
+pnpm run test:coverage       # coverage report (thresholds on the split engine)
+SITE_URL=http://localhost:3000 pnpm build  # production build (SITE_URL is required)
+vercel --prod                # deploy (or via GitHub integration)
 ```
 
 ---
@@ -252,14 +252,16 @@ What exists (as of the last session — nothing committed yet, all changes are i
 
 - Next.js 16 App Router + Tailwind v4 + shadcn/ui primitives (Base UI) in `components/ui/` — `button`, `card`, `input`, `label`, `separator`, `avatar`, `badge`.
 - Design tokens in `app/globals.css`: `--primary-text`, `--inverse`, plus a marketing-only display type scale (`text-display-md/lg`, `text-lead`) used by landing copy alone — app copy stays on `text-sm/base/lg`.
-- `domains/expenses/split.ts` — the split engine (equal / percentage / exact, deterministic remainder distribution) and `lib/currency.ts` (INR parse + format). Treat as settlement-adjacent: test before touching.
+- `domains/expenses/split.ts` — the split engine: `computeSplit` for equal / exact / percentage / shares, integer minor units, explicit payer index, typed errors, deterministic remainder distribution. `summarizeEqualSplit` feeds the Quick Split UI. `lib/currency.ts` handles INR parse + format. Treat as settlement-adjacent: test before touching.
+- `domains/expenses/schemas.ts` — `splitInputSchema` (Zod) mirrors the domain rules for API-boundary validation, ready for the expense route handlers.
+- `tests/` + `vitest.config.mts` / `vitest.setup.ts` — Vitest 5 + React Testing Library (jsdom); `test` / `test:coverage` scripts. Domain split coverage is 100% lines, 98% statements.
 - `app/(marketing)/` — `layout.tsx` (Header + Footer + MotionProvider + no-JS reveal fallback) and `page.tsx` (Hero with the interactive `SplitCalculator`, HowItWorks, Features, FAQ), composing components from `app/(marketing)/_components/`.
 - `SplitCalculator` feature: entry → result → customize stages, validation surfaced live via `computeSplit`.
 - Deleted the committed `types/` folder (stale copy of Next's generated route types — it broke `tsc --noEmit`) and gitignored `/types/`; Next regenerates it under `.next/types/`.
 
-Still missing: Supabase/Prisma/Auth wiring, any `(dashboard)` route, CI/CD, Vitest (`package.json` has no test script yet), an OG image for marketing metadata, and a browser-based visual pass over the landing page.
+Still missing: Supabase/Prisma/Auth wiring, any `(dashboard)` route, CI/CD, an OG image for marketing metadata, and a browser-based visual pass over the landing page.
 
-Last verification: `pnpm build`, `npx tsc --noEmit`, `npx eslint .` all pass.
+Last verification: `pnpm test`, `pnpm run test:coverage`, `pnpm exec tsc --noEmit`, `pnpm lint`, and `SITE_URL=http://localhost:3000 pnpm build` all pass. (`pnpm build` without `SITE_URL` fails by design — `config/env.ts` requires it outside dev.)
 
 Update this section every session: what's built, what's in progress, what broke last time. Keep `MEMORY.md` in sync with this.
 

@@ -32,6 +32,7 @@ export function SplitCalculator() {
     status,
     isValid,
     leftoverCents,
+    leftoverRecipientIndexes,
     equalShareCents,
     equalSharePercent,
     minPeople,
@@ -82,6 +83,7 @@ export function SplitCalculator() {
             status={status}
             copyStatus={copyStatus}
             leftoverCents={leftoverCents}
+            leftoverRecipientIndexes={leftoverRecipientIndexes}
             equalShareCents={equalShareCents}
             resultRef={resultRef}
             onCustomize={handleCustomize}

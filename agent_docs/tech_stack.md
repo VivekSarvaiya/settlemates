@@ -24,14 +24,25 @@ Detailed reference for the exact tools this project uses. Check here before addi
 | Hosting/CI | Vercel | Git-push-to-deploy, preview per PR |
 | Testing | Vitest + React Testing Library | |
 
+## Project Layout
+
+Code lives at the **repository root — there is no `src/` folder**. `app/`, `components/`, `domains/`, `lib/`, `db/`, `config/`, and `tests/` are all top-level directories, and the `@/` path alias maps to the repo root. The `src/` tree sketched in `docs/TechDesign-MVP.md` is superseded; `rules/nextjs.md` holds the canonical file-type destination table.
+
 ## Setup Commands
 
+`pnpm` is the package manager — `packageManager` in `package.json` pins the version. Never use `npm` or `yarn`: they write a competing lockfile and ignore the pin.
+
 ```bash
-npm install
-npx prisma generate
-npx prisma migrate dev
-npm run dev
+pnpm install
+pnpm exec prisma generate
+pnpm exec prisma migrate dev
+pnpm dev
+pnpm lint
+pnpm exec tsc --noEmit      # typecheck (no "typecheck" script defined yet)
+pnpm build
 ```
+
+Vitest is the chosen test runner but is not installed yet, so there is no `test` script — add it when the suite is set up.
 
 ## Canonical Patterns
 

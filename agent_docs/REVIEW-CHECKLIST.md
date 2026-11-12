@@ -8,8 +8,8 @@ Run through this before marking any feature "done" or opening a PR for merge. Th
 - [ ] Edge cases checked: empty states, zero-amount expenses, single-participant groups, non-evenly-divisible splits
 
 ## Code Quality
-- [ ] `npm run lint` passes with no new warnings
-- [ ] `npm run typecheck` passes — no new `any` without a justifying comment
+- [ ] `pnpm run lint` passes with no new warnings
+- [ ] `pnpm run typecheck` passes — no new `any` without a justifying comment
 - [ ] No unrelated files reformatted or touched
 - [ ] Domain module boundaries respected (no direct cross-domain internals access)
 
@@ -17,7 +17,7 @@ Run through this before marking any feature "done" or opening a PR for merge. Th
 - [ ] Unit tests written for new business logic, especially anything touching balances, splits, or settlement
 - [ ] Settlement engine / split-validation changes: coverage at or near 100% for the changed logic
 - [ ] Integration test covers the critical path if this feature affects balance state
-- [ ] `npm test` passes locally, including previously-passing tests (no regressions)
+- [ ] `pnpm test` passes locally, including previously-passing tests (no regressions)
 
 ## Security
 - [ ] Row-Level Security policy updated if a new table or access pattern was introduced

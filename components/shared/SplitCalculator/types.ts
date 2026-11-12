@@ -3,6 +3,9 @@ import type { SplitMode } from "@/domains/expenses/split";
 
 export type CalculatorStage = "entry" | "result" | "customize";
 
+/** The Quick Split UI exposes three modes; "shares" is domain/API-only. */
+export type CalculatorSplitMode = Exclude<SplitMode, "shares">;
+
 export type CopyStatus = "idle" | "copied" | "error";
 
 export interface Participant {
@@ -37,6 +40,7 @@ export interface ResultViewProps {
   status: AllocationStatus;
   copyStatus: CopyStatus;
   leftoverCents: number;
+  leftoverRecipientIndexes: number[];
   equalShareCents: number;
   resultRef: RefObject<HTMLDivElement | null>;
   onCustomize: () => void;
@@ -48,14 +52,14 @@ export interface CustomizeViewProps {
   totalCents: number;
   participants: Participant[];
   sharesCents: number[];
-  splitMode: SplitMode;
+  splitMode: CalculatorSplitMode;
   status: AllocationStatus;
   isValid: boolean;
   equalShareCents: number;
   equalSharePercent: number;
   customizeRef: RefObject<HTMLDivElement | null>;
   onNameChange: (id: string, name: string) => void;
-  onModeChange: (mode: SplitMode) => void;
+  onModeChange: (mode: CalculatorSplitMode) => void;
   onValueChange: (id: string, value: string) => void;
   onApply: () => void;
   onBack: () => void;
@@ -65,7 +69,7 @@ export interface ParticipantRowProps {
   participant: Participant;
   index: number;
   shareCents: number;
-  splitMode: SplitMode;
+  splitMode: CalculatorSplitMode;
   equalShareCents: number;
   equalSharePercent: number;
   onNameChange: (id: string, name: string) => void;
@@ -73,7 +77,7 @@ export interface ParticipantRowProps {
 }
 
 export interface SplitModeOption {
-  value: SplitMode;
+  value: CalculatorSplitMode;
   label: string;
   description: string;
 }

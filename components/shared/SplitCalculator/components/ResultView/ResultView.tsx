@@ -23,15 +23,20 @@ export function ResultView({
   status,
   copyStatus,
   leftoverCents,
+  leftoverRecipientIndexes,
   equalShareCents,
   resultRef,
   onCustomize,
   onCopy,
   onReset,
 }: ResultViewProps) {
-  const recipients = participants
-    .slice(0, leftoverCents)
-    .map((participant, index) => displayName(participant.name, index))
+  const recipients = leftoverRecipientIndexes
+    .flatMap((participantIndex) => {
+      const participant = participants[participantIndex];
+      return participant
+        ? [displayName(participant.name, participantIndex)]
+        : [];
+    })
     .join(", ");
 
   return (

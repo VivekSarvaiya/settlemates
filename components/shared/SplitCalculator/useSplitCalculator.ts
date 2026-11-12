@@ -3,9 +3,9 @@ import type { FormEvent } from "react";
 import {
   computeSplit,
   parsePercentInput,
-  splitEqually,
-  type SplitAllocation,
-  type SplitMode,
+  summarizeEqualSplit,
+  type SplitInput,
+  type SplitResult,
 } from "@/domains/expenses/split";
 import { formatCents, parseAmountToCents } from "@/lib/currency";
 import {
@@ -16,6 +16,7 @@ import {
 } from "./const";
 import type {
   AllocationStatus,
+  CalculatorSplitMode,
   CalculatorStage,
   CopyStatus,
   Participant,
@@ -29,14 +30,81 @@ function createParticipants(count: number): Participant[] {
   }));
 }
 
-function toAllocation(value: string, mode: SplitMode): SplitAllocation {
+function buildSplitInput(
+  mode: CalculatorSplitMode,
+  totalCents: number,
+  participants: Participant[],
+): SplitInput {
   if (mode === "percentage") {
-    return { mode, percent: parsePercentInput(value) ?? Number.NaN };
+    return {
+      mode,
+      totalCents,
+      percentages: participants.map((participant) =>
+        parsePercentInput(participant.value),
+      ),
+    };
   }
   if (mode === "exact") {
-    return { mode, cents: parseAmountToCents(value) ?? Number.NaN };
+    return {
+      mode,
+      totalCents,
+      amountsCents: participants.map((participant) =>
+        parseAmountToCents(participant.value),
+      ),
+    };
   }
-  return { mode };
+  return { mode, totalCents, participantCount: participants.length };
+}
+
+function describeStatus(
+  result: SplitResult,
+  totalCents: number,
+  participants: Participant[],
+): AllocationStatus {
+  if (result.ok) {
+    return { tone: "valid", text: `Adds up to ${formatCents(totalCents)} exactly` };
+  }
+
+  const { error } = result;
+
+  if (error.code === "amount-mismatch" || error.code === "percentage-mismatch") {
+    if (error.differenceCents !== undefined && error.differenceCents !== 0) {
+      const difference = formatCents(Math.abs(error.differenceCents));
+      return {
+        tone: "invalid",
+        text:
+          error.differenceCents > 0
+            ? `${difference} still to assign`
+            : `${difference} over the total`,
+      };
+    }
+    return {
+      tone: "invalid",
+      text:
+        error.code === "percentage-mismatch"
+          ? "Percentages must add up to 100%"
+          : "Fix the highlighted shares",
+    };
+  }
+
+  if (
+    error.code === "invalid-amount" ||
+    error.code === "invalid-percentage" ||
+    error.code === "invalid-share" ||
+    error.code === "no-shares"
+  ) {
+    const hasEmptyShare = participants.some(
+      (participant) => participant.value.trim() === "",
+    );
+    return {
+      tone: "invalid",
+      text: hasEmptyShare
+        ? "Enter a share for everyone"
+        : "Fix the highlighted shares",
+    };
+  }
+
+  return { tone: "invalid", text: "Fix the highlighted shares" };
 }
 
 export const useSplitCalculator = () => {
@@ -46,7 +114,7 @@ export const useSplitCalculator = () => {
   const [peopleCount, setPeopleCount] = useState(DEFAULT_PEOPLE_COUNT);
   const [totalCents, setTotalCents] = useState(0);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [splitMode, setSplitMode] = useState<SplitMode>("equal");
+  const [splitMode, setSplitMode] = useState<CalculatorSplitMode>("equal");
   const [isCustomized, setIsCustomized] = useState(false);
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
 
@@ -55,59 +123,28 @@ export const useSplitCalculator = () => {
   const customizeRef = useRef<HTMLDivElement>(null);
   const pendingAmountFocusRef = useRef(false);
 
-  const allocations = useMemo(
-    () => participants.map((participant) => toAllocation(participant.value, splitMode)),
-    [participants, splitMode],
+  const splitInput = useMemo(
+    () => buildSplitInput(splitMode, totalCents, participants),
+    [splitMode, totalCents, participants],
   );
-  const splitResult = useMemo(
-    () => computeSplit(totalCents, allocations),
-    [totalCents, allocations],
-  );
-  const sharesCents = useMemo(
-    () =>
-      isCustomized
-        ? splitResult.sharesCents
-        : splitEqually(totalCents, participants.length),
-    [isCustomized, splitResult.sharesCents, totalCents, participants.length],
+  const splitResult = useMemo(() => computeSplit(splitInput), [splitInput]);
+
+  const equalSummary = useMemo(
+    () => summarizeEqualSplit(totalCents, participants.length),
+    [totalCents, participants.length],
   );
 
-  const status: AllocationStatus = useMemo(() => {
-    if (splitResult.isValid) {
-      return {
-        tone: "valid",
-        text: `Adds up to ${formatCents(totalCents)} exactly`,
-      };
-    }
-    if (splitResult.remainderCents > 0) {
-      return {
-        tone: "invalid",
-        text: `${formatCents(splitResult.remainderCents)} still to assign`,
-      };
-    }
-    if (splitResult.remainderCents < 0) {
-      return {
-        tone: "invalid",
-        text: `${formatCents(-splitResult.remainderCents)} over the total`,
-      };
-    }
-    const hasEmptyShare = participants.some(
-      (participant) => participant.value.trim() === "",
-    );
-    return {
-      tone: "invalid",
-      text: hasEmptyShare ? "Enter a share for everyone" : "Fix the highlighted shares",
-    };
-  }, [splitResult, totalCents, participants]);
+  const draftSharesCents = splitResult.ok
+    ? splitResult.sharesCents
+    : splitResult.previewSharesCents;
+  const sharesCents = isCustomized
+    ? draftSharesCents
+    : equalSummary.sharesCents;
 
-  const hasPeople = participants.length > 0;
-  const leftoverCents =
-    !isCustomized && hasPeople ? totalCents % participants.length : 0;
-  const equalShareCents = hasPeople
-    ? Math.floor(totalCents / participants.length)
-    : 0;
-  const equalSharePercent = hasPeople
-    ? Math.round(1000 / participants.length) / 10
-    : 0;
+  const status = useMemo(
+    () => describeStatus(splitResult, totalCents, participants),
+    [splitResult, totalCents, participants],
+  );
 
   const summaryText = useMemo(() => {
     const rows = participants.map((participant, index) => {
@@ -169,7 +206,7 @@ export const useSplitCalculator = () => {
   const handleBack = () => setStage("result");
 
   const handleApply = () => {
-    if (!splitResult.isValid) return;
+    if (!splitResult.ok) return;
     setIsCustomized(true);
     setStage("result");
   };
@@ -201,7 +238,7 @@ export const useSplitCalculator = () => {
     updateParticipant(id, (participant) => ({ ...participant, name }));
 
   // Values mean different things per mode (percent vs rupees), so switching clears them.
-  const handleModeChange = (mode: SplitMode) => {
+  const handleModeChange = (mode: CalculatorSplitMode) => {
     if (mode === splitMode) return;
     setSplitMode(mode);
     setParticipants((current) =>
@@ -229,15 +266,16 @@ export const useSplitCalculator = () => {
     totalCents,
     participants,
     sharesCents,
-    draftSharesCents: splitResult.sharesCents,
+    draftSharesCents,
     splitMode,
     isCustomized,
     copyStatus,
     status,
-    isValid: splitResult.isValid,
-    leftoverCents,
-    equalShareCents,
-    equalSharePercent,
+    isValid: splitResult.ok,
+    leftoverCents: equalSummary.remainderCents,
+    leftoverRecipientIndexes: equalSummary.remainderRecipientIndexes,
+    equalShareCents: equalSummary.baseShareCents,
+    equalSharePercent: equalSummary.baseSharePercent,
     minPeople: MIN_PARTICIPANTS,
     maxPeople: MAX_PARTICIPANTS,
     amountInputRef,

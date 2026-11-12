@@ -6,16 +6,29 @@ const EXAMPLE_NAMES = ["You", "Amit", "Priya"];
 const EXAMPLE_PERCENTS = [50, 30, 20];
 const EXAMPLE_EXACT_CENTS = [120000, 50000, 30000];
 
+function requireShares(result: ReturnType<typeof computeSplit>): number[] {
+  if (!result.ok) {
+    throw new Error(`Example split is invalid: ${result.error.message}`);
+  }
+  return result.sharesCents;
+}
+
 // Shares come from the same domain functions the calculator uses, so the examples can't drift.
 const equalShares = splitEqually(EXAMPLE_TOTAL_CENTS, EXAMPLE_NAMES.length);
-const percentShares = computeSplit(
-  EXAMPLE_TOTAL_CENTS,
-  EXAMPLE_PERCENTS.map((percent) => ({ mode: "percentage" as const, percent })),
-).sharesCents;
-const exactShares = computeSplit(
-  EXAMPLE_TOTAL_CENTS,
-  EXAMPLE_EXACT_CENTS.map((cents) => ({ mode: "exact" as const, cents })),
-).sharesCents;
+const percentShares = requireShares(
+  computeSplit({
+    mode: "percentage",
+    totalCents: EXAMPLE_TOTAL_CENTS,
+    percentages: EXAMPLE_PERCENTS,
+  }),
+);
+const exactShares = requireShares(
+  computeSplit({
+    mode: "exact",
+    totalCents: EXAMPLE_TOTAL_CENTS,
+    amountsCents: EXAMPLE_EXACT_CENTS,
+  }),
+);
 
 export const SPLIT_METHODS: SplitMethod[] = [
   {
