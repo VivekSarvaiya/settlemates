@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Copy, Pencil, RotateCcw } from "lucide-react";
+import { CheckCircle2, Copy, Pencil, RotateCcw } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { ShareBar } from "@/components/ui/share-bar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -8,25 +8,22 @@ import { Button } from "@/components/ui/button";
 import { cn } from "cn";
 import { formatCents } from "@/lib/currency";
 import { AVATAR_TINTS } from "../../const";
+import { displayName } from "../../displayName";
 import type { ResultViewProps } from "../../types";
-
-function displayName(name: string, index: number) {
-  return name.trim() || `Person ${index + 1}`;
-}
+import { SettlementList } from "../SettlementList/SettlementList";
 
 export function ResultView({
   totalCents,
-  peopleCount,
   participants,
+  paidCents,
   sharesCents,
-  isCustomized,
-  status,
-  copyStatus,
   leftoverCents,
   leftoverRecipientIndexes,
   equalShareCents,
+  settlements,
+  copyStatus,
   resultRef,
-  onCustomize,
+  onEditSplit,
   onCopy,
   onReset,
 }: ResultViewProps) {
@@ -40,20 +37,22 @@ export function ResultView({
     .join(", ");
 
   return (
-    <div ref={resultRef} tabIndex={-1} className="flex flex-col gap-6 outline-none">
+    <div
+      ref={resultRef}
+      tabIndex={-1}
+      className="flex flex-col gap-6 outline-none"
+    >
       <div className="flex flex-col gap-1">
         <span className="text-sm text-muted-foreground">
-          {isCustomized ? "Bill total" : `Each of ${peopleCount} pays`}
+          Each of {participants.length} pays
         </span>
         <AnimatedNumber
-          value={isCustomized ? totalCents : equalShareCents}
+          value={equalShareCents}
           format="currency"
           className="text-display-md font-medium"
         />
         <span className="text-sm text-muted-foreground">
-          {isCustomized
-            ? `split ${peopleCount} ways`
-            : `of a ${formatCents(totalCents)} bill`}
+          from a {formatCents(totalCents)} bill
         </span>
       </div>
 
@@ -64,7 +63,7 @@ export function ResultView({
         }))}
       />
 
-      <ul className="flex flex-col">
+      <ul aria-label="Shares" className="flex flex-col">
         {participants.map((participant, index) => (
           <li
             key={participant.id}
@@ -80,41 +79,45 @@ export function ResultView({
                 {displayName(participant.name, index).charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="min-w-0 flex-1 truncate text-base">
-              {displayName(participant.name, index)}
-            </span>
-            <span className="text-base font-medium tabular-nums">
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-base">
+                {displayName(participant.name, index)}
+              </span>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                paid {formatCents(paidCents[index] ?? 0)}
+              </span>
+            </div>
+            <span className="shrink-0 text-base font-medium tabular-nums">
               {formatCents(sharesCents[index] ?? 0)}
             </span>
           </li>
         ))}
       </ul>
 
-      {!isCustomized && leftoverCents > 0 && (
+      {leftoverCents > 0 && (
         <p className="text-sm text-muted-foreground">
           The extra {formatCents(leftoverCents)} goes to {recipients}.
         </p>
       )}
 
-      <div className="flex items-center gap-2 text-sm">
-        {status.tone === "valid" ? (
-          <CheckCircle2 aria-hidden="true" className="size-4 text-primary-text" />
-        ) : (
-          <AlertCircle aria-hidden="true" className="size-4 text-destructive" />
-        )}
-        <span
-          className={
-            status.tone === "valid" ? "text-primary-text" : "text-destructive"
-          }
-        >
-          {status.text}
-        </span>
-      </div>
+      {settlements.length > 0 ? (
+        <SettlementList participants={participants} transactions={settlements} />
+      ) : (
+        <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm">
+          <CheckCircle2
+            aria-hidden="true"
+            className="size-4 shrink-0 text-primary-text"
+          />
+          <span className="text-primary-text">
+            Everyone&apos;s square. No one needs to pay anyone.
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2">
-        <Button className="h-11 w-full text-base" onClick={onCustomize}>
+        <Button className="h-11 w-full text-base" onClick={onEditSplit}>
           <Pencil aria-hidden="true" data-icon="inline-start" />
-          Customise split
+          Edit payments
         </Button>
         <div className="flex gap-2">
           <Button
@@ -140,7 +143,8 @@ export function ResultView({
         {copyStatus === "copied" && (
           <span className="text-primary-text">Copied to clipboard.</span>
         )}
-        {copyStatus === "error" && "Copy blocked — select the list and copy manually."}
+        {copyStatus === "error" &&
+          "Copy blocked — select the list and copy manually."}
       </p>
     </div>
   );

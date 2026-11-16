@@ -5,18 +5,18 @@ export interface Step {
 
 export const STEPS: Step[] = [
   {
-    title: "Enter the bill",
+    title: "Add the people",
     description:
-      "Type the total and how many people are splitting. No account, no app install.",
+      "Add everyone who shared the bill. No account, no app install.",
   },
   {
-    title: "Set the shares",
+    title: "Enter what each person paid",
     description:
-      "Split equally, by percentage, or by exact amount. The calculator tells you the moment it adds up.",
+      "Type each person's contribution. The total and every equal share update as you type.",
   },
   {
     title: "Share the result",
     description:
-      "Copy the breakdown and send it to the group, so everyone knows what they owe before anyone pays.",
+      "Copy the shares and the who-pays-whom settlement, so everyone knows what to pay before anyone does.",
   },
 ];

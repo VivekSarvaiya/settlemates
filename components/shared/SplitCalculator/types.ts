@@ -1,83 +1,65 @@
 import type { FormEvent, RefObject } from "react";
-import type { SplitMode } from "@/domains/expenses/split";
+import type { SettlementTransaction } from "@/domains/settlement/settle";
 
-export type CalculatorStage = "entry" | "result" | "customize";
-
-/** The Quick Split UI exposes three modes; "shares" is domain/API-only. */
-export type CalculatorSplitMode = Exclude<SplitMode, "shares">;
+export type CalculatorStage = "setup" | "result";
 
 export type CopyStatus = "idle" | "copied" | "error";
 
 export interface Participant {
   id: string;
   name: string;
-  value: string;
+  /** What this person paid, as typed. Blank means zero. */
+  paidInput: string;
 }
 
-export interface AllocationStatus {
-  tone: "valid" | "invalid";
+export interface SetupNotice {
+  tone: "hint" | "error";
   text: string;
 }
 
-export interface EntryFormProps {
-  amountInput: string;
-  amountError: string | null;
-  peopleCount: number;
+export interface SetupViewProps {
+  participants: Participant[];
   minPeople: number;
   maxPeople: number;
-  amountInputRef: RefObject<HTMLInputElement | null>;
-  onAmountChange: (value: string) => void;
+  totalCents: number;
+  sharesCents: number[];
+  equalShareCents: number;
+  notice: SetupNotice | null;
+  canSubmit: boolean;
+  firstPaymentRef: RefObject<HTMLInputElement | null>;
   onPeopleChange: (delta: number) => void;
+  onNameChange: (id: string, name: string) => void;
+  onPaidChange: (id: string, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export interface ResultViewProps {
   totalCents: number;
-  peopleCount: number;
   participants: Participant[];
+  paidCents: number[];
   sharesCents: number[];
-  isCustomized: boolean;
-  status: AllocationStatus;
-  copyStatus: CopyStatus;
   leftoverCents: number;
   leftoverRecipientIndexes: number[];
   equalShareCents: number;
+  settlements: SettlementTransaction[];
+  copyStatus: CopyStatus;
   resultRef: RefObject<HTMLDivElement | null>;
-  onCustomize: () => void;
+  onEditSplit: () => void;
   onCopy: () => void;
   onReset: () => void;
 }
 
-export interface CustomizeViewProps {
-  totalCents: number;
+export interface SettlementListProps {
   participants: Participant[];
-  sharesCents: number[];
-  splitMode: CalculatorSplitMode;
-  status: AllocationStatus;
-  isValid: boolean;
-  equalShareCents: number;
-  equalSharePercent: number;
-  customizeRef: RefObject<HTMLDivElement | null>;
-  onNameChange: (id: string, name: string) => void;
-  onModeChange: (mode: CalculatorSplitMode) => void;
-  onValueChange: (id: string, value: string) => void;
-  onApply: () => void;
-  onBack: () => void;
+  transactions: SettlementTransaction[];
 }
 
 export interface ParticipantRowProps {
   participant: Participant;
   index: number;
   shareCents: number;
-  splitMode: CalculatorSplitMode;
-  equalShareCents: number;
-  equalSharePercent: number;
+  areSharesVisible: boolean;
+  paidInputRef?: RefObject<HTMLInputElement | null>;
   onNameChange: (id: string, name: string) => void;
-  onValueChange: (id: string, value: string) => void;
-}
-
-export interface SplitModeOption {
-  value: CalculatorSplitMode;
-  label: string;
-  description: string;
+  onPaidChange: (id: string, value: string) => void;
 }

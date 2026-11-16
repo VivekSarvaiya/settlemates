@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { summarizeEqualSplit } from "@/domains/expenses/split";
 import {
-  computeSplit,
-  parsePercentInput,
-  summarizeEqualSplit,
-  type SplitInput,
-  type SplitResult,
-} from "@/domains/expenses/split";
+  computeSettlement,
+  type SettlementTransaction,
+} from "@/domains/settlement/settle";
 import { formatCents, parseAmountToCents } from "@/lib/currency";
 import {
   DEFAULT_NAMES,
@@ -14,154 +12,173 @@ import {
   MAX_PARTICIPANTS,
   MIN_PARTICIPANTS,
 } from "./const";
+import { displayName } from "./displayName";
 import type {
-  AllocationStatus,
-  CalculatorSplitMode,
   CalculatorStage,
   CopyStatus,
   Participant,
+  SetupNotice,
 } from "./types";
+
+interface ContributionSummary {
+  /** Blank rows are valid zero contributions. Invalid rows are reported separately. */
+  paidCents: number[];
+  paidTotalCents: bigint;
+  hasInvalidValue: boolean;
+  isTotalTooLarge: boolean;
+}
 
 function createParticipants(count: number): Participant[] {
   return Array.from({ length: count }, (_, index) => ({
     id: `person-${index + 1}`,
     name: DEFAULT_NAMES[index] ?? `Friend ${index + 1}`,
-    value: "",
+    paidInput: "",
   }));
 }
 
-function buildSplitInput(
-  mode: CalculatorSplitMode,
-  totalCents: number,
+function summarizeContributions(
   participants: Participant[],
-): SplitInput {
-  if (mode === "percentage") {
-    return {
-      mode,
-      totalCents,
-      percentages: participants.map((participant) =>
-        parsePercentInput(participant.value),
-      ),
-    };
-  }
-  if (mode === "exact") {
-    return {
-      mode,
-      totalCents,
-      amountsCents: participants.map((participant) =>
-        parseAmountToCents(participant.value),
-      ),
-    };
-  }
-  return { mode, totalCents, participantCount: participants.length };
-}
+): ContributionSummary {
+  const paidCents: number[] = [];
+  let paidTotalCents = BigInt(0);
+  let hasInvalidValue = false;
 
-function describeStatus(
-  result: SplitResult,
-  totalCents: number,
-  participants: Participant[],
-): AllocationStatus {
-  if (result.ok) {
-    return { tone: "valid", text: `Adds up to ${formatCents(totalCents)} exactly` };
-  }
+  for (const participant of participants) {
+    const input = participant.paidInput.trim();
+    const cents = input === "" ? 0 : parseAmountToCents(input);
 
-  const { error } = result;
-
-  if (error.code === "amount-mismatch" || error.code === "percentage-mismatch") {
-    if (error.differenceCents !== undefined && error.differenceCents !== 0) {
-      const difference = formatCents(Math.abs(error.differenceCents));
-      return {
-        tone: "invalid",
-        text:
-          error.differenceCents > 0
-            ? `${difference} still to assign`
-            : `${difference} over the total`,
-      };
+    if (cents === null || !Number.isSafeInteger(cents)) {
+      hasInvalidValue = true;
+      paidCents.push(0);
+      continue;
     }
-    return {
-      tone: "invalid",
-      text:
-        error.code === "percentage-mismatch"
-          ? "Percentages must add up to 100%"
-          : "Fix the highlighted shares",
-    };
+
+    paidCents.push(cents);
+    paidTotalCents += BigInt(cents);
   }
 
-  if (
-    error.code === "invalid-amount" ||
-    error.code === "invalid-percentage" ||
-    error.code === "invalid-share" ||
-    error.code === "no-shares"
-  ) {
-    const hasEmptyShare = participants.some(
-      (participant) => participant.value.trim() === "",
-    );
-    return {
-      tone: "invalid",
-      text: hasEmptyShare
-        ? "Enter a share for everyone"
-        : "Fix the highlighted shares",
-    };
-  }
-
-  return { tone: "invalid", text: "Fix the highlighted shares" };
+  return {
+    paidCents,
+    paidTotalCents,
+    hasInvalidValue,
+    isTotalTooLarge: paidTotalCents > BigInt(Number.MAX_SAFE_INTEGER),
+  };
 }
 
 export const useSplitCalculator = () => {
-  const [stage, setStage] = useState<CalculatorStage>("entry");
-  const [amountInput, setAmountInput] = useState("");
-  const [amountError, setAmountError] = useState<string | null>(null);
-  const [peopleCount, setPeopleCount] = useState(DEFAULT_PEOPLE_COUNT);
-  const [totalCents, setTotalCents] = useState(0);
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [splitMode, setSplitMode] = useState<CalculatorSplitMode>("equal");
-  const [isCustomized, setIsCustomized] = useState(false);
+  const [stage, setStage] = useState<CalculatorStage>("setup");
+  const [participants, setParticipants] = useState<Participant[]>(() =>
+    createParticipants(DEFAULT_PEOPLE_COUNT),
+  );
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
 
-  const amountInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
-  const customizeRef = useRef<HTMLDivElement>(null);
-  const pendingAmountFocusRef = useRef(false);
+  const firstPaymentRef = useRef<HTMLInputElement>(null);
+  const pendingSetupFocusRef = useRef(false);
 
-  const splitInput = useMemo(
-    () => buildSplitInput(splitMode, totalCents, participants),
-    [splitMode, totalCents, participants],
+  const contributionSummary = useMemo(
+    () => summarizeContributions(participants),
+    [participants],
   );
-  const splitResult = useMemo(() => computeSplit(splitInput), [splitInput]);
+
+  // The bill total is simply what the group paid. No separate amount to reconcile.
+  const totalCents = contributionSummary.isTotalTooLarge
+    ? 0
+    : Number(contributionSummary.paidTotalCents);
 
   const equalSummary = useMemo(
     () => summarizeEqualSplit(totalCents, participants.length),
     [totalCents, participants.length],
   );
+  const sharesCents = equalSummary.sharesCents;
 
-  const draftSharesCents = splitResult.ok
-    ? splitResult.sharesCents
-    : splitResult.previewSharesCents;
-  const sharesCents = isCustomized
-    ? draftSharesCents
-    : equalSummary.sharesCents;
+  const isValid =
+    !contributionSummary.hasInvalidValue &&
+    !contributionSummary.isTotalTooLarge &&
+    totalCents > 0;
 
-  const status = useMemo(
-    () => describeStatus(splitResult, totalCents, participants),
-    [splitResult, totalCents, participants],
-  );
+  const settlements = useMemo<SettlementTransaction[]>(() => {
+    if (!isValid) return [];
+
+    const result = computeSettlement(
+      contributionSummary.paidCents,
+      sharesCents,
+    );
+    return result.ok ? result.transactions : [];
+  }, [isValid, contributionSummary, sharesCents]);
+
+  const notice = useMemo<SetupNotice | null>(() => {
+    if (contributionSummary.hasInvalidValue) {
+      return {
+        tone: "error",
+        text: "Fix the highlighted payments to continue.",
+      };
+    }
+    if (contributionSummary.isTotalTooLarge) {
+      return { tone: "error", text: "These amounts are too large." };
+    }
+    if (totalCents === 0) {
+      return {
+        tone: "hint",
+        text: "Enter what each person paid to get started.",
+      };
+    }
+    return null;
+  }, [
+    contributionSummary.hasInvalidValue,
+    contributionSummary.isTotalTooLarge,
+    totalCents,
+  ]);
 
   const summaryText = useMemo(() => {
     const rows = participants.map((participant, index) => {
-      const name = participant.name.trim() || `Person ${index + 1}`;
-      return `${name} · ${formatCents(sharesCents[index] ?? 0)}`;
+      const name = displayName(participant.name, index);
+      const paid = contributionSummary.paidCents[index] ?? 0;
+      return `${name} paid ${formatCents(paid)} · share ${formatCents(sharesCents[index] ?? 0)}`;
     });
-    return [`Split of ${formatCents(totalCents)}`, ...rows].join("\n");
-  }, [participants, sharesCents, totalCents]);
+
+    const lines = [
+      `${formatCents(totalCents)} split between ${participants.length} ${
+        participants.length === 1 ? "person" : "people"
+      }`,
+      `Each pays ${formatCents(equalSummary.baseShareCents)}`,
+      "",
+      ...rows,
+    ];
+
+    if (settlements.length > 0) {
+      lines.push("", "Who pays whom");
+      for (const transaction of settlements) {
+        const from = displayName(
+          participants[transaction.fromIndex]?.name ?? "",
+          transaction.fromIndex,
+        );
+        const to = displayName(
+          participants[transaction.toIndex]?.name ?? "",
+          transaction.toIndex,
+        );
+        lines.push(`${from} pays ${to} ${formatCents(transaction.amountCents)}`);
+      }
+    } else {
+      lines.push("", "Everyone's square — no payments needed.");
+    }
+
+    return lines.join("\n");
+  }, [
+    participants,
+    contributionSummary,
+    sharesCents,
+    settlements,
+    totalCents,
+    equalSummary.baseShareCents,
+  ]);
 
   useEffect(() => {
     if (stage === "result") {
       resultRef.current?.focus();
-    } else if (stage === "customize") {
-      customizeRef.current?.focus();
-    } else if (pendingAmountFocusRef.current) {
-      pendingAmountFocusRef.current = false;
-      amountInputRef.current?.focus();
+    } else if (pendingSetupFocusRef.current) {
+      pendingSetupFocusRef.current = false;
+      firstPaymentRef.current?.focus();
     }
   }, [stage]);
 
@@ -172,54 +189,39 @@ export const useSplitCalculator = () => {
     return () => clearTimeout(timer);
   }, [copyStatus]);
 
-  const handleAmountChange = (value: string) => {
-    setAmountInput(value);
-    if (amountError) setAmountError(null);
-  };
-
   const handlePeopleChange = (delta: number) => {
-    setPeopleCount((count) =>
-      Math.min(MAX_PARTICIPANTS, Math.max(MIN_PARTICIPANTS, count + delta)),
-    );
+    setParticipants((current) => {
+      const nextCount = Math.min(
+        MAX_PARTICIPANTS,
+        Math.max(MIN_PARTICIPANTS, current.length + delta),
+      );
+      if (nextCount === current.length) return current;
+      if (nextCount < current.length) return current.slice(0, nextCount);
+
+      return [
+        ...current,
+        ...createParticipants(nextCount).slice(current.length),
+      ];
+    });
   };
 
   const handleCalculate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isValid) return;
 
-    const cents = parseAmountToCents(amountInput);
-    if (cents === null || cents <= 0) {
-      setAmountError("Enter an amount greater than 0.");
-      amountInputRef.current?.focus();
-      return;
-    }
-
-    setAmountError(null);
-    setTotalCents(cents);
-    setParticipants(createParticipants(peopleCount));
-    setSplitMode("equal");
-    setIsCustomized(false);
     setCopyStatus("idle");
     setStage("result");
   };
 
-  const handleCustomize = () => setStage("customize");
-  const handleBack = () => setStage("result");
-
-  const handleApply = () => {
-    if (!splitResult.ok) return;
-    setIsCustomized(true);
-    setStage("result");
+  const handleEditSplit = () => {
+    pendingSetupFocusRef.current = true;
+    setStage("setup");
   };
 
   const handleReset = () => {
-    pendingAmountFocusRef.current = true;
-    setStage("entry");
-    setAmountInput("");
-    setAmountError(null);
-    setTotalCents(0);
-    setParticipants([]);
-    setSplitMode("equal");
-    setIsCustomized(false);
+    pendingSetupFocusRef.current = true;
+    setStage("setup");
+    setParticipants(createParticipants(DEFAULT_PEOPLE_COUNT));
     setCopyStatus("idle");
   };
 
@@ -237,17 +239,8 @@ export const useSplitCalculator = () => {
   const handleNameChange = (id: string, name: string) =>
     updateParticipant(id, (participant) => ({ ...participant, name }));
 
-  // Values mean different things per mode (percent vs rupees), so switching clears them.
-  const handleModeChange = (mode: CalculatorSplitMode) => {
-    if (mode === splitMode) return;
-    setSplitMode(mode);
-    setParticipants((current) =>
-      current.map((participant) => ({ ...participant, value: "" })),
-    );
-  };
-
-  const handleValueChange = (id: string, value: string) =>
-    updateParticipant(id, (participant) => ({ ...participant, value }));
+  const handlePaidChange = (id: string, paidInput: string) =>
+    updateParticipant(id, (participant) => ({ ...participant, paidInput }));
 
   const handleCopy = async () => {
     try {
@@ -260,37 +253,27 @@ export const useSplitCalculator = () => {
 
   return {
     stage,
-    amountInput,
-    amountError,
-    peopleCount,
-    totalCents,
     participants,
+    paidCents: contributionSummary.paidCents,
+    totalCents,
     sharesCents,
-    draftSharesCents,
-    splitMode,
-    isCustomized,
     copyStatus,
-    status,
-    isValid: splitResult.ok,
+    notice,
+    canSubmit: isValid,
+    settlements,
     leftoverCents: equalSummary.remainderCents,
     leftoverRecipientIndexes: equalSummary.remainderRecipientIndexes,
     equalShareCents: equalSummary.baseShareCents,
-    equalSharePercent: equalSummary.baseSharePercent,
     minPeople: MIN_PARTICIPANTS,
     maxPeople: MAX_PARTICIPANTS,
-    amountInputRef,
+    firstPaymentRef,
     resultRef,
-    customizeRef,
-    handleAmountChange,
     handlePeopleChange,
     handleCalculate,
-    handleCustomize,
-    handleBack,
-    handleApply,
+    handleEditSplit,
     handleReset,
     handleNameChange,
-    handleModeChange,
-    handleValueChange,
+    handlePaidChange,
     handleCopy,
   };
 };

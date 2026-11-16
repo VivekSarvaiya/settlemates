@@ -12,12 +12,12 @@ export const FAQS: FaqEntry[] = [
   {
     question: "What happens when the split doesn't divide evenly?",
     answer:
-      "The leftover is never hidden. The calculator shows exactly which person covers the extra amount, and percentage or exact splits won't apply until they add up to the total.",
+      "The leftover is never hidden. The calculator gives the extra paisa to the first person in the list and names who covers the extra amount, so every share adds up to the total.",
   },
   {
     question: "Can I edit a split after I've shared it?",
     answer:
-      "Yes. Reopen the split, change a name, a share, or the total, and copy the updated breakdown — the balances follow automatically.",
+      "Yes. Reopen the split, change a name or a payment, and copy the updated breakdown — the balances follow automatically.",
   },
   {
     question: "Does it work for trips and shared rent, not just one-off bills?",

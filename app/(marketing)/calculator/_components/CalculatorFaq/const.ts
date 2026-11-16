@@ -7,19 +7,24 @@ import type { CalculatorFaqEntry } from "./types";
 // Also feeds the FAQPage structured data, so visible answers and JSON-LD always match.
 export const CALCULATOR_FAQS: CalculatorFaqEntry[] = [
   {
-    question: "How do I split a bill equally?",
+    question: "How does the split calculator work?",
     answer:
-      "Enter the total, set the number of people, and tap Split it. Each share is shown in rupees. If the amount doesn't divide evenly, the extra paisa go to the first people in the list, so the shares always add up to the bill.",
+      "Enter what each person paid towards the bill. The calculator adds those contributions to get the total, splits it equally, and shows each person's share plus who pays whom so everyone ends up square.",
   },
   {
-    question: "How do I split a bill unequally?",
+    question: "What if someone didn't pay anything?",
     answer:
-      "After the equal split, choose Customise split and pick Percentage or Amount. Enter each person's share — the calculator shows how much is still to assign and only applies the split once it matches the total exactly.",
+      "Leave their payment blank or enter 0. They still get an equal share, so the calculator will show them paying their share to whoever covered more of the bill.",
   },
   {
-    question: "Can I split a bill by percentage?",
+    question: "Does it show who pays whom?",
     answer:
-      "Yes. Choose Percentage and give each person a share of 100%. Amounts are worked out to the paisa, and any rounding difference is assigned to someone so nothing goes missing.",
+      "Yes, whenever someone owes someone. The settlement clears the balances with the fewest practical payments, such as \"You pay Amit ₹666.67\". If everyone is already square, it says so.",
+  },
+  {
+    question: "What happens when the total doesn't divide evenly?",
+    answer:
+      "The extra paisa go to the first person in the list, so the shares always add up to the total exactly. The result names who covers the extra amount.",
   },
   {
     question: "How many people can split a bill?",

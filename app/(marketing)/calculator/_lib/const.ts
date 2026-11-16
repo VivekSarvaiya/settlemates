@@ -1,7 +1,7 @@
 export const CALCULATOR_PAGE = {
-  title: "Split Bill Calculator — Equal, % or Exact Amounts",
+  title: "Split Bill Calculator — Enter Who Paid What",
   description:
-    "Split a bill between friends in seconds. Divide it equally, by percentage, or by exact amounts in rupees, with every paisa accounted for. No sign-up needed.",
+    "Record what each person paid and split the bill equally in seconds. See every share and who pays whom, with every paisa accounted for. No sign-up needed.",
   appName: "SettleMates Split Bill Calculator",
   breadcrumb: "Calculator",
 } as const;

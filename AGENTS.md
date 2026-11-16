@@ -246,20 +246,21 @@ import Table from './components/Table/Table';
 
 ## Current State
 
-**Phase 1 — Foundation & Setup. Marketing landing page is built; app/auth/DB not started.**
+**Phase 1 — Foundation & Setup. Marketing landing page and Quick Split are built; app/auth/DB not started.**
 
-What exists (as of the last session — nothing committed yet, all changes are in the working tree):
+What exists (the landing page and calculator are committed on `main`; settlement + contributions are the current uncommitted work):
 
 - Next.js 16 App Router + Tailwind v4 + shadcn/ui primitives (Base UI) in `components/ui/` — `button`, `card`, `input`, `label`, `separator`, `avatar`, `badge`.
 - Design tokens in `app/globals.css`: `--primary-text`, `--inverse`, plus a marketing-only display type scale (`text-display-md/lg`, `text-lead`) used by landing copy alone — app copy stays on `text-sm/base/lg`.
 - `domains/expenses/split.ts` — the split engine: `computeSplit` for equal / exact / percentage / shares, integer minor units, explicit payer index, typed errors, deterministic remainder distribution. `summarizeEqualSplit` feeds the Quick Split UI. `lib/currency.ts` handles INR parse + format. Treat as settlement-adjacent: test before touching.
 - `domains/expenses/schemas.ts` — `splitInputSchema` (Zod) mirrors the domain rules for API-boundary validation, ready for the expense route handlers.
-- `tests/` + `vitest.config.mts` / `vitest.setup.ts` — Vitest 5 + React Testing Library (jsdom); `test` / `test:coverage` scripts. Domain split coverage is 100% lines, 98% statements.
-- `app/(marketing)/` — `layout.tsx` (Header + Footer + MotionProvider + no-JS reveal fallback) and `page.tsx` (Hero with the interactive `SplitCalculator`, HowItWorks, Features, FAQ), composing components from `app/(marketing)/_components/`.
-- `SplitCalculator` feature: entry → result → customize stages, validation surfaced live via `computeSplit`.
+- `domains/settlement/settle.ts` — the settlement engine: `computeSettlement(paidCents, sharesCents)` and `settleBalances(netBalancesCents)`. Integer minor units, BigInt totals, typed errors, deterministic greedy largest-creditor/largest-debtor matching with lowest-index tie-breaks (Tech Design F7). Returns the minimal practical payment list, at most n−1 transactions. Reuse this for the group settlement API — do not re-implement matching.
+- `tests/` + `vitest.config.mts` / `vitest.setup.ts` — Vitest 5 + React Testing Library (jsdom); `test` / `test:coverage` scripts. 77 tests; split and settlement are 100% line covered.
+- `app/(marketing)/` — `layout.tsx` (Header + Footer + MotionProvider + no-JS reveal fallback), `page.tsx` (Hero with the interactive `SplitCalculator`, HowItWorks, Features, FAQ), and `/calculator` (search-focused landing page), composing components from `app/(marketing)/_components/` and `app/(marketing)/calculator/_components/`.
+- `SplitCalculator` feature: one setup screen (people stepper, editable participant rows with name + amount paid) → result. Contributions are the only input: there is no separate bill total or split-method picker, so the total is the sum of what everyone paid and the bill is always split equally. The live summary shows the total and each person's equal share; the result shows shares, the "Who pays whom" settlement from `computeSettlement` when someone owes someone (or an "Everyone's square" note), and a copyable summary. Cap is 20 participants. "Edit payments" returns to the same contributions. The domain split engine still supports equal/exact/percentage/shares for future group expenses — only the Quick Split UI is contributions-only.
 - Deleted the committed `types/` folder (stale copy of Next's generated route types — it broke `tsc --noEmit`) and gitignored `/types/`; Next regenerates it under `.next/types/`.
 
-Still missing: Supabase/Prisma/Auth wiring, any `(dashboard)` route, CI/CD, an OG image for marketing metadata, and a browser-based visual pass over the landing page.
+Still missing: Supabase/Prisma/Auth wiring, any `(dashboard)` route, CI/CD, an OG image for marketing metadata, and a browser-based visual pass over the landing/calculator pages (including a 12-person contributions flow and the derived-total summary).
 
 Last verification: `pnpm test`, `pnpm run test:coverage`, `pnpm exec tsc --noEmit`, `pnpm lint`, and `SITE_URL=http://localhost:3000 pnpm build` all pass. (`pnpm build` without `SITE_URL` fails by design — `config/env.ts` requires it outside dev.)
 

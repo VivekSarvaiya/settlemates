@@ -7,49 +7,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CustomizeView, EntryView, ResultView } from "./components";
+import { ResultView, SetupView } from "./components";
 import { useSplitCalculator } from "./useSplitCalculator";
 
 const STAGE_COPY = {
-  entry: "Split a bill in seconds — no sign-up needed.",
+  setup: "Add who paid what. We'll split it equally and work out who pays whom.",
   result: "Everyone's share, worked out.",
-  customize: "Pick one way to split, then set each person's share.",
 } as const;
 
 export function SplitCalculator() {
   const {
     stage,
-    amountInput,
-    amountError,
-    peopleCount,
-    totalCents,
     participants,
+    paidCents,
+    totalCents,
     sharesCents,
-    draftSharesCents,
-    splitMode,
-    isCustomized,
     copyStatus,
-    status,
-    isValid,
+    notice,
+    canSubmit,
+    settlements,
     leftoverCents,
     leftoverRecipientIndexes,
     equalShareCents,
-    equalSharePercent,
     minPeople,
     maxPeople,
-    amountInputRef,
+    firstPaymentRef,
     resultRef,
-    customizeRef,
-    handleAmountChange,
     handlePeopleChange,
     handleCalculate,
-    handleCustomize,
-    handleBack,
-    handleApply,
+    handleEditSplit,
     handleReset,
     handleNameChange,
-    handleModeChange,
-    handleValueChange,
+    handlePaidChange,
     handleCopy,
   } = useSplitCalculator();
 
@@ -60,53 +49,38 @@ export function SplitCalculator() {
         <CardDescription>{STAGE_COPY[stage]}</CardDescription>
       </CardHeader>
       <CardContent>
-        {stage === "entry" && (
-          <EntryView
-            amountInput={amountInput}
-            amountError={amountError}
-            peopleCount={peopleCount}
+        {stage === "setup" && (
+          <SetupView
+            participants={participants}
             minPeople={minPeople}
             maxPeople={maxPeople}
-            amountInputRef={amountInputRef}
-            onAmountChange={handleAmountChange}
+            totalCents={totalCents}
+            sharesCents={sharesCents}
+            equalShareCents={equalShareCents}
+            notice={notice}
+            canSubmit={canSubmit}
+            firstPaymentRef={firstPaymentRef}
             onPeopleChange={handlePeopleChange}
+            onNameChange={handleNameChange}
+            onPaidChange={handlePaidChange}
             onSubmit={handleCalculate}
           />
         )}
         {stage === "result" && (
           <ResultView
             totalCents={totalCents}
-            peopleCount={peopleCount}
             participants={participants}
+            paidCents={paidCents}
             sharesCents={sharesCents}
-            isCustomized={isCustomized}
-            status={status}
-            copyStatus={copyStatus}
             leftoverCents={leftoverCents}
             leftoverRecipientIndexes={leftoverRecipientIndexes}
             equalShareCents={equalShareCents}
+            settlements={settlements}
+            copyStatus={copyStatus}
             resultRef={resultRef}
-            onCustomize={handleCustomize}
+            onEditSplit={handleEditSplit}
             onCopy={handleCopy}
             onReset={handleReset}
-          />
-        )}
-        {stage === "customize" && (
-          <CustomizeView
-            totalCents={totalCents}
-            participants={participants}
-            sharesCents={draftSharesCents}
-            splitMode={splitMode}
-            status={status}
-            isValid={isValid}
-            equalShareCents={equalShareCents}
-            equalSharePercent={equalSharePercent}
-            customizeRef={customizeRef}
-            onNameChange={handleNameChange}
-            onModeChange={handleModeChange}
-            onValueChange={handleValueChange}
-            onApply={handleApply}
-            onBack={handleBack}
           />
         )}
       </CardContent>

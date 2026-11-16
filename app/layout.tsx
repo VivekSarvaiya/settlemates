@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s — SettleMates",
   },
   description:
-    "Track shared expenses, split bills any way you like, and settle up with the minimal number of payments. No spreadsheets, no mental math.",
+    "Track shared expenses, split bills equally, and settle up with the minimal number of payments. No spreadsheets, no mental math.",
   openGraph: {
     siteName: "SettleMates",
     type: "website",

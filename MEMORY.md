@@ -11,7 +11,7 @@ Session-to-session memory. Read this before starting work in a new chat/session.
 
 **Definition of done for this phase:** a signed-in user can land on an empty dashboard, the Prisma schema for the core entities (User, Group, GroupMember, Expense, ExpenseSplit, Invitation, SettlementTransaction, Notification) is migrated to a dev Supabase project, and a push to `main` deploys automatically.
 
-**Where things actually stand:** the marketing landing page is built and green (`pnpm build` with `SITE_URL` set, `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test` all pass), but nothing is committed — the entire landing page, split engine, schemas, and tests live only in the working tree. Auth, DB, dashboard, and CI/CD are untouched.
+**Where things actually stand:** the marketing landing page and Quick Split calculator are committed on `main` (through PR #1); Quick Split is now contributions-only (derived total, equal split, settlement) and the settlement engine plus its tests are the current uncommitted work. `pnpm build` (with `SITE_URL`), `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test`, and `pnpm run test:coverage` all pass. Auth, DB, dashboard, and CI/CD are untouched.
 
 ---
 
@@ -27,6 +27,11 @@ Session-to-session memory. Read this before starting work in a new chat/session.
 - **2026-11-12** — Rewrote `domains/expenses/split.ts` around one `computeSplit(input)` entry point: equal/exact/percentage/shares, integer minor units, BigInt internals, typed errors (`invalid-total`, `amount-mismatch`, etc.), and a display-only `previewSharesCents` for in-progress input. Equal-split remainder goes to an explicit `payerIndex` (default 0) then in participant order; percentage/shares use largest-remainder with index tie-break. Added `summarizeEqualSplit` so the Quick Split hook holds no arithmetic.
 - **2026-11-12** — Added `domains/expenses/schemas.ts` (`splitInputSchema`) to validate split payloads at the API boundary, mirroring the domain rules. Installed Vitest 5 + React Testing Library (jsdom), added `test` / `test:coverage` scripts, `vitest.config.mts`, and `vitest.setup.ts`; domain split coverage is 100% lines / 98% statements.
 - **2026-11-12** — Quick Split UI stays on equal/percentage/exact (`CalculatorSplitMode` excludes `"shares"`); shares is domain/API-only until the group expense form lands.
+- **2026-11-13** — Added `domains/settlement/settle.ts` (`computeSettlement(paidCents, sharesCents)` + `settleBalances`) as the single settlement engine: integer minor units, BigInt totals, typed errors, deterministic greedy largest-creditor/largest-debtor matching with lowest-index tie-breaks, per `docs/TechDesign-MVP.md` F7. 18 domain tests lock the office-event output and the everyone-ends-at-zero invariant.
+- **2026-11-13** — Quick Split gained a fourth **Paid** tab (contributions mode): row values are what each person contributed, blank means ₹0, the bill is split equally, and contributions must add up to the bill before Apply unlocks. The result screen shows a "Who pays whom" list from the settlement engine. The participant cap rose from 10 to 20 for the 12-person office case. Non-contribution modes assume participant 0 ("You") paid the whole bill.
+- **2026-11-13** — Split-mode tab picker is `grid-cols-2 sm:grid-cols-4` now that there are four modes; settlement rows are only shown while the allocation is valid so a back-navigation with an unfinished custom split can't claim "all settled".
+- **2026-11-13** — Merged Quick Split's entry and customize stages into one setup screen: bill total, people stepper, all four split-method tabs, and editable participant rows are visible immediately, with shares and validation updating live. The result's "Customise split" button became "Edit split" and returns to that same screen. "Who pays whom" renders only when at least one settlement transaction exists and the mode isn't a plain equal split; an empty list no longer renders an "all settled" message.
+- **2026-11-14** — Quick Split is now contributions-only. Removed the Equal/Percentage/Amount method tabs and the separate bill-total input; participants enter only what they paid, the total is the sum of those payments, and the bill is split equally. Deleted `CustomizeView`, `EntryView`, mode state, and the marketing `SplitMethods` section; rewrote calculator/home copy, FAQ, and metadata around "enter who paid what". The domain split engine still supports equal/exact/percentage/shares for future group expenses — only the Quick Split UI narrowed.
 
 ---
 
@@ -38,6 +43,7 @@ Binding product decisions, not assumptions to revisit in passing. Each resolves 
 - **Money is integer minor units.** Amounts are stored and calculated as paise/cents (integer), never floats. Parsing and formatting live in `lib/currency.ts`; split math lives in `domains/expenses/split.ts` — extend those modules instead of re-implementing money handling.
 - **Equal-split remainder goes to the payer's share.** The payer is an explicit `payerIndex` (defaults to 0); leftover paise go to the payer first, then in participant order. Never drop or spread remainder arbitrarily.
 - **Quick Split is guest-first.** Creating and viewing a Quick Split requires no authentication; auth is required only to convert a Quick Split into a persistent group.
+- **Settlement is greedy, not exhaustively optimal.** The engine matches largest creditor to largest debtor until balances clear (at most n−1 payments, usually far fewer). It is deterministic and explainable; don't replace it with a combinatorial solver for the MVP, and don't claim "fewest possible" in UI copy.
 
 ---
 
@@ -55,7 +61,7 @@ Carried from `docs/TechDesign-MVP.md` — these need a product decision, not a c
 
 ## Next Session Starting Point
 
-1. **Nothing is committed.** First job: review the working tree (`git status`), split it into sensible Conventional Commits on a feature branch, and push a PR — the tree currently holds shadcn primitives, `domains/expenses/split.ts`, `lib/currency.ts`, and the whole `app/(marketing)/` page.
-2. **Visual QA of the landing page is unverified** — `pnpm dev` and click through: entry → result → customize → apply → copy → start over, plus mobile viewport and keyboard-only navigation. Check the `#split-amount` / `#how-it-works` / `#features` / `#faq` anchors against the sticky header offset (`scroll-mt-20`).
-3. **Tests now exist.** `pnpm test` runs Vitest (domain split, schemas, and a Quick Split RTL flow); `pnpm run test:coverage` enforces thresholds on `domains/expenses/split.ts`. Keep this suite green as the expense API starts consuming the domain.
+1. **Current work is uncommitted.** The settlement engine (`domains/settlement/`), its tests, and the Quick Split contributions/settlement UI are in the working tree on `main`. Review `git status`, make a feature branch, and land it as Conventional Commits — don't sweep unrelated files into the commit.
+2. **Visual QA of the calculators is unverified** — `pnpm dev` and click through both `/` and `/calculator`: setup (people stepper + paid inputs, including 12-person contributions) → split → edit payments → copy → start over, plus mobile viewport and keyboard-only navigation. Confirm the derived total and equal share update live, "Who pays whom" appears when someone owes someone, and the "Everyone's square" note appears when contributions match shares. Check the `#how-to-split` / `#how-it-works` / `#features` / `#faq` anchors against the sticky header offset (`scroll-mt-20`).
+3. **Tests now exist.** `pnpm test` runs Vitest (domain split, settlement, schemas, and Quick Split RTL flows); `pnpm run test:coverage` enforces thresholds on `domains/expenses/split.ts` and `domains/settlement/settle.ts`. Keep this suite green as the expense API starts consuming the domain.
 4. Then move into the real Phase 1 work: Supabase project, Prisma schema, auth wiring, CI/CD.

@@ -15,8 +15,8 @@ export function HowItWorks() {
             Three steps, start to settled.
           </h2>
           <p className="text-lead text-muted-foreground">
-            The whole flow is built to be understood without instructions —
-            enter a number, adjust the shares, hand the answer to the group.
+            The whole flow is built to be understood without instructions — add
+            your people, enter what they paid, hand the answer to the group.
           </p>
         </Reveal>
 

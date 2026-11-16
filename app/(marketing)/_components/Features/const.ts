@@ -17,9 +17,9 @@ export interface Feature {
 export const FEATURES: Feature[] = [
   {
     icon: Coins,
-    title: "Split any way",
+    title: "Every payment accounted for",
     description:
-      "Equal, percentage, or exact amounts — with every leftover paisa accounted for, never silently dropped.",
+      "Record who paid what. The bill is split equally and every leftover paisa is assigned, never silently dropped.",
   },
   {
     icon: Scale,

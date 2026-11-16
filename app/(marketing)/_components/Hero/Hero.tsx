@@ -17,8 +17,8 @@ export function Hero() {
             Split expenses, not friendships.
           </h1>
           <p className="text-lead text-muted-foreground">
-            Track shared expenses, split bills any way you like, and settle up
-            with the fewest payments possible. No spreadsheets, no mental math.
+            Track shared expenses, split bills evenly, and settle up with the
+            fewest payments possible. No spreadsheets, no mental math.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Button

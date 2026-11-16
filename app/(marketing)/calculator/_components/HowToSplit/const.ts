@@ -2,23 +2,23 @@ import type { HowToStep } from "./types";
 
 export const HOW_TO_STEPS: HowToStep[] = [
   {
-    title: "Enter the bill total",
+    title: "Add everyone",
     description:
-      "Type the amount in rupees, including any tax or tip, then use + and − to set how many people are paying.",
+      "Use + and − to set how many people shared the bill, then rename each person if you like.",
   },
   {
-    title: "Check the equal split",
+    title: "Enter what each person paid",
     description:
-      "Tap Split it to see what each person owes. If the total doesn't divide evenly, the calculator shows who covers the extra paisa.",
+      "Type contributions in rupees. Leave anyone who paid nothing blank — the total builds itself.",
   },
   {
-    title: "Customise if it wasn't even",
+    title: "Split it equally",
     description:
-      "Choose Customise split, pick Percentage or Amount, and enter each share. The calculator shows what's left to assign until it adds up.",
+      "Tap Split it to see each person's equal share. Any extra paisa go to the first person in the list.",
   },
   {
-    title: "Copy and share",
+    title: "Copy and settle up",
     description:
-      "Rename everyone, apply the split, and copy the breakdown into WhatsApp or any group chat.",
+      "Copy the shares and the who-pays-whom payments into WhatsApp or any group chat.",
   },
 ];

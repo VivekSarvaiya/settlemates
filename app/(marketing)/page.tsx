@@ -4,7 +4,7 @@ import { Faq, Features, Hero, HowItWorks } from "./_components";
 
 const TITLE = "SettleMates — Split expenses, not friendships";
 const DESCRIPTION =
-  "Track shared expenses, split bills any way you like, and settle up with the minimal number of payments. No spreadsheets, no mental math.";
+  "Track shared expenses, split bills equally, and settle up with the minimal number of payments. No spreadsheets, no mental math.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },

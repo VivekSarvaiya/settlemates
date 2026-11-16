@@ -34,10 +34,10 @@ export function CalculatorHero() {
               Split bill calculator
             </h1>
             <p className="text-lead text-muted-foreground">
-              Split any bill between friends in seconds — equally, by
-              percentage, or by exact amounts. Every share is shown in rupees,
-              every paisa is accounted for, and the breakdown is ready to paste
-              into your group chat.
+              Record who paid what and split the bill equally in seconds. Every
+              share is shown in rupees, every paisa is accounted for, and the
+              settlement shows who pays whom before you paste it into the group
+              chat.
             </p>
             <ul className="flex flex-col gap-2.5">
               {CALCULATOR_HIGHLIGHTS.map((highlight) => (

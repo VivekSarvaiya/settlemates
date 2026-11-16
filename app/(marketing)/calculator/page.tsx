@@ -6,7 +6,6 @@ import {
   CalculatorHero,
   HowToSplit,
   KeepTrack,
-  SplitMethods,
 } from "./_components";
 import { CALCULATOR_PAGE } from "./_lib/const";
 import { buildCalculatorStructuredData } from "./_lib/structuredData";
@@ -37,7 +36,6 @@ export default function SplitBillCalculatorPage() {
     <>
       <JsonLd data={buildCalculatorStructuredData()} />
       <CalculatorHero />
-      <SplitMethods />
       <HowToSplit />
       <CalculatorFaq />
       <KeepTrack />

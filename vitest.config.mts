@@ -15,7 +15,7 @@ export default defineConfig({
     include: ["tests/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
-      include: ["domains/expenses/split.ts"],
+      include: ["domains/expenses/split.ts", "domains/settlement/settle.ts"],
       thresholds: {
         lines: 95,
         functions: 95,
