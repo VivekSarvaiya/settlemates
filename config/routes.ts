@@ -1,4 +1,4 @@
 export const ROUTES = {
   home: "/",
-  splitBillCalculator: "/calculator",
+  splitBillCalculator: "/split-bill-calculator",
 } as const;

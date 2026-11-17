@@ -1,14 +1,14 @@
 "use client";
 
-import { CheckCircle2, Copy, Pencil, RotateCcw } from "lucide-react";
+import { CheckCircle2, Copy, Pencil, RotateCcw, Share2 } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/animated-number";
-import { ShareBar } from "@/components/ui/share-bar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "cn";
 import { formatCents } from "@/lib/currency";
-import { AVATAR_TINTS } from "../../const";
+import { AVATAR_TINTS, BALANCE_TONE_CLASSES } from "../../const";
 import { displayName } from "../../displayName";
+import { describeBalance } from "../../phrases";
 import type { ResultViewProps } from "../../types";
 import { SettlementList } from "../SettlementList/SettlementList";
 
@@ -16,15 +16,17 @@ export function ResultView({
   totalCents,
   participants,
   paidCents,
-  sharesCents,
+  balancesCents,
   leftoverCents,
   leftoverRecipientIndexes,
   equalShareCents,
   settlements,
   copyStatus,
+  canShare,
   resultRef,
   onEditSplit,
   onCopy,
+  onShare,
   onReset,
 }: ResultViewProps) {
   const recipients = leftoverRecipientIndexes
@@ -35,16 +37,17 @@ export function ResultView({
         : [];
     })
     .join(", ");
+  const peopleLabel = `${participants.length} ${participants.length === 1 ? "person" : "people"}`;
 
   return (
     <div
       ref={resultRef}
       tabIndex={-1}
-      className="flex flex-col gap-6 outline-none"
+      className="flex scroll-mt-36 flex-col gap-6 outline-none"
     >
       <div className="flex flex-col gap-1">
         <span className="text-sm text-muted-foreground">
-          Each of {participants.length} pays
+          Each person&apos;s share
         </span>
         <AnimatedNumber
           value={equalShareCents}
@@ -52,46 +55,50 @@ export function ResultView({
           className="text-display-md font-medium"
         />
         <span className="text-sm text-muted-foreground">
-          from a {formatCents(totalCents)} bill
+          {peopleLabel} · {formatCents(totalCents)} bill
         </span>
       </div>
 
-      <ShareBar
-        segments={participants.map((participant, index) => ({
-          id: `${participant.id}-${index}`,
-          cents: sharesCents[index] ?? 0,
-        }))}
-      />
-
       <ul aria-label="Shares" className="flex flex-col">
-        {participants.map((participant, index) => (
-          <li
-            key={participant.id}
-            className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0"
-          >
-            <Avatar size="sm">
-              <AvatarFallback
-                className={cn(
-                  AVATAR_TINTS[index % AVATAR_TINTS.length],
-                  "font-medium",
-                )}
-              >
-                {displayName(participant.name, index).charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-base">
-                {displayName(participant.name, index)}
-              </span>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                paid {formatCents(paidCents[index] ?? 0)}
-              </span>
-            </div>
-            <span className="shrink-0 text-base font-medium tabular-nums">
-              {formatCents(sharesCents[index] ?? 0)}
-            </span>
-          </li>
-        ))}
+        {participants.map((participant, index) => {
+          const balance = describeBalance(balancesCents[index] ?? 0);
+
+          return (
+            <li
+              key={participant.id}
+              className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0"
+            >
+              <Avatar size="sm">
+                <AvatarFallback
+                  className={cn(
+                    AVATAR_TINTS[index % AVATAR_TINTS.length],
+                    "font-medium",
+                  )}
+                >
+                  {displayName(participant.name, index).charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="truncate text-base">
+                    {displayName(participant.name, index)}
+                  </span>
+                  <span
+                    className={cn(
+                      "shrink-0 text-sm font-medium whitespace-nowrap tabular-nums",
+                      BALANCE_TONE_CLASSES[balance.tone],
+                    )}
+                  >
+                    {balance.text}
+                  </span>
+                </div>
+                <span className="text-sm text-muted-foreground tabular-nums">
+                  paid {formatCents(paidCents[index] ?? 0)}
+                </span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
 
       {leftoverCents > 0 && (
@@ -115,18 +122,35 @@ export function ResultView({
       )}
 
       <div className="flex flex-col gap-2">
-        <Button className="h-11 w-full text-base" onClick={onEditSplit}>
-          <Pencil aria-hidden="true" data-icon="inline-start" />
-          Edit payments
-        </Button>
+        {canShare ? (
+          <Button className="h-12 w-full text-base" onClick={onShare}>
+            <Share2 aria-hidden="true" data-icon="inline-start" />
+            Share with the group
+          </Button>
+        ) : (
+          <Button className="h-12 w-full text-base" onClick={onCopy}>
+            <Copy aria-hidden="true" data-icon="inline-start" />
+            Copy for the group chat
+          </Button>
+        )}
         <div className="flex gap-2">
+          {canShare && (
+            <Button
+              variant="outline"
+              className="h-11 flex-1 text-base"
+              onClick={onCopy}
+            >
+              <Copy aria-hidden="true" data-icon="inline-start" />
+              Copy
+            </Button>
+          )}
           <Button
             variant="outline"
             className="h-11 flex-1 text-base"
-            onClick={onCopy}
+            onClick={onEditSplit}
           >
-            <Copy aria-hidden="true" data-icon="inline-start" />
-            Copy
+            <Pencil aria-hidden="true" data-icon="inline-start" />
+            Edit
           </Button>
           <Button
             variant="ghost"
@@ -141,7 +165,10 @@ export function ResultView({
 
       <p aria-live="polite" className="min-h-5 text-sm text-muted-foreground">
         {copyStatus === "copied" && (
-          <span className="text-primary-text">Copied to clipboard.</span>
+          <span className="text-primary-text">
+            Copied, with a link that reopens this split. Paste it in the group
+            chat.
+          </span>
         )}
         {copyStatus === "error" &&
           "Copy blocked — select the list and copy manually."}

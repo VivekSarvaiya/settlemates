@@ -1,5 +1,6 @@
-import type { FormEvent, RefObject } from "react";
+import type { FocusEvent, FormEvent, RefObject } from "react";
 import type { SettlementTransaction } from "@/domains/settlement/settle";
+import type { useSplitCalculator } from "./useSplitCalculator";
 
 export type CalculatorStage = "setup" | "result";
 
@@ -12,6 +13,16 @@ export interface Participant {
   paidInput: string;
 }
 
+export interface SharedPerson {
+  name: string;
+  paidCents: number;
+}
+
+export interface BalanceLabel {
+  tone: "credit" | "debit" | "square";
+  text: string;
+}
+
 export interface SetupNotice {
   tone: "hint" | "error";
   text: string;
@@ -22,14 +33,16 @@ export interface SetupViewProps {
   minPeople: number;
   maxPeople: number;
   totalCents: number;
-  sharesCents: number[];
+  balancesCents: number[];
   equalShareCents: number;
   notice: SetupNotice | null;
   canSubmit: boolean;
   firstPaymentRef: RefObject<HTMLInputElement | null>;
   onPeopleChange: (delta: number) => void;
   onNameChange: (id: string, name: string) => void;
+  onNameFocus: (event: FocusEvent<HTMLInputElement>) => void;
   onPaidChange: (id: string, value: string) => void;
+  onPaidBlur: (id: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
@@ -37,15 +50,17 @@ export interface ResultViewProps {
   totalCents: number;
   participants: Participant[];
   paidCents: number[];
-  sharesCents: number[];
+  balancesCents: number[];
   leftoverCents: number;
   leftoverRecipientIndexes: number[];
   equalShareCents: number;
   settlements: SettlementTransaction[];
   copyStatus: CopyStatus;
+  canShare: boolean;
   resultRef: RefObject<HTMLDivElement | null>;
   onEditSplit: () => void;
   onCopy: () => void;
+  onShare: () => void;
   onReset: () => void;
 }
 
@@ -57,9 +72,17 @@ export interface SettlementListProps {
 export interface ParticipantRowProps {
   participant: Participant;
   index: number;
-  shareCents: number;
-  areSharesVisible: boolean;
+  balanceCents: number;
+  isBalanceVisible: boolean;
   paidInputRef?: RefObject<HTMLInputElement | null>;
   onNameChange: (id: string, name: string) => void;
+  onNameFocus: (event: FocusEvent<HTMLInputElement>) => void;
   onPaidChange: (id: string, value: string) => void;
+  onPaidBlur: (id: string) => void;
+}
+
+export type SplitCalculatorState = ReturnType<typeof useSplitCalculator>;
+
+export interface CalculatorCardProps {
+  calculator: SplitCalculatorState;
 }

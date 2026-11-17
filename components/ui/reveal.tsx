@@ -7,7 +7,7 @@ import { EASE_OUT, REVEAL_VIEWPORT } from "@/lib/animation"
 function Reveal({
   children,
   delay = 0,
-  y = 28,
+  y = 16,
   className,
 }: {
   children: React.ReactNode
@@ -23,7 +23,7 @@ function Reveal({
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={REVEAL_VIEWPORT}
-      transition={{ duration: 0.7, delay, ease: EASE_OUT }}
+      transition={{ duration: 0.45, delay, ease: EASE_OUT }}
     >
       {children}
     </motion.div>

@@ -1,11 +1,4 @@
-import {
-  ArrowLeftRight,
-  Coins,
-  Link2,
-  Scale,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { ArrowLeftRight, Coins, Link2, ShieldCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface Feature {
@@ -16,39 +9,27 @@ export interface Feature {
 
 export const FEATURES: Feature[] = [
   {
-    icon: Coins,
-    title: "Every payment accounted for",
-    description:
-      "Record who paid what. The bill is split equally and every leftover paisa is assigned, never silently dropped.",
-  },
-  {
-    icon: Scale,
-    title: "Balances that stay live",
-    description:
-      "Each expense instantly updates who owes whom, so the group never has to reconstruct the math later.",
-  },
-  {
     icon: ArrowLeftRight,
-    title: "Smart settlement",
+    title: "Who pays whom, not just a share",
     description:
-      "Everyone's debts get condensed into the smallest number of payments, each one explained in plain language.",
+      "You get the actual transfers to make, in plain words. A group of six never needs more than five of them.",
+  },
+  {
+    icon: Coins,
+    title: "Every paisa accounted for",
+    description:
+      "When a bill doesn't divide evenly, the extra paisa go to the first person in the list and the result says so. Shares always add up to the total.",
   },
   {
     icon: Link2,
-    title: "Quick Split from a link",
+    title: "A link that reopens the split",
     description:
-      "Run a one-off bill without creating an account, then keep it if the group turns into a longer story.",
-  },
-  {
-    icon: Users,
-    title: "Trips, rent, and one-offs",
-    description:
-      "A weekend away, a shared flat, or a single dinner bill — the same people and the same running balance.",
+      "Copy or share the result and it comes with a link. Whoever opens it sees the same numbers, ready to check or edit.",
   },
   {
     icon: ShieldCheck,
-    title: "Nothing hidden",
+    title: "Private by default",
     description:
-      "Every share shows how it was worked out, so anyone in the group can check the number and agree with it.",
+      "No account, and nothing stored on our servers. The split lives in your browser and inside the link you share.",
   },
 ];

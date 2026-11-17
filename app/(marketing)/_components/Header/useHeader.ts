@@ -49,6 +49,8 @@ export const useHeader = () => {
     return () => observer.disconnect();
   }, [pathname]);
 
+  const ctaHref = `${pathname === ROUTES.splitBillCalculator ? ROUTES.splitBillCalculator : ROUTES.home}#quick-split`;
+
   const activeHref =
     pathname === ROUTES.home
       ? NAV_ITEMS.find((item) => item.sectionId === activeSection)?.href
@@ -71,6 +73,7 @@ export const useHeader = () => {
     isScrolled,
     isOpen,
     activeHref,
+    ctaHref,
     navItems: NAV_ITEMS,
     handleToggleOpen,
     handleNavigate,

@@ -1,3 +1,4 @@
+export { ComingSoon } from "./ComingSoon/ComingSoon";
 export { Faq } from "./Faq/Faq";
 export { Features } from "./Features/Features";
 export { Footer } from "./Footer/Footer";

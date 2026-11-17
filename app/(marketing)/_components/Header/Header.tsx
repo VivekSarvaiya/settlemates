@@ -7,7 +7,6 @@ import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/shared";
-import { ROUTES } from "@/config/routes";
 import { useHeader } from "./useHeader";
 
 export function Header() {
@@ -15,6 +14,7 @@ export function Header() {
     isScrolled,
     isOpen,
     activeHref,
+    ctaHref,
     navItems,
     handleToggleOpen,
     handleNavigate,
@@ -53,7 +53,7 @@ export function Header() {
           <Button
             className="h-11 px-4 md:h-9"
             nativeButton={false}
-            render={<Link href={ROUTES.splitBillCalculator} />}
+            render={<Link href={ctaHref} />}
           >
             Try it now
             <ArrowRight aria-hidden="true" data-icon="inline-end" />

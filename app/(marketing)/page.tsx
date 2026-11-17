@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { ROUTES } from "@/config/routes";
-import { Faq, Features, Hero, HowItWorks } from "./_components";
+import { ComingSoon, Faq, Features, Hero, HowItWorks } from "./_components";
 
 const TITLE = "SettleMates — Split expenses, not friendships";
 const DESCRIPTION =
-  "Track shared expenses, split bills equally, and settle up with the minimal number of payments. No spreadsheets, no mental math.";
+  "Type what everyone paid and see who pays whom in seconds. Free, no sign-up, nothing saved. Trips and shared flats coming soon.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
   },
@@ -30,6 +30,7 @@ export default function Home() {
       <Hero />
       <HowItWorks />
       <Features />
+      <ComingSoon />
       <Faq />
     </>
   );

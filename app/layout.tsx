@@ -1,11 +1,10 @@
+import { env } from "@/config/env";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-import { env } from "@/config/env";
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.SITE_URL),
@@ -14,19 +13,23 @@ export const metadata: Metadata = {
     template: "%s — SettleMates",
   },
   description:
-    "Track shared expenses, split bills equally, and settle up with the minimal number of payments. No spreadsheets, no mental math.",
+    "Type what everyone paid and see who pays whom in seconds. Free, no sign-up, nothing saved.",
   openGraph: {
     siteName: "SettleMates",
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
   },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={cn("h-full antialiased", inter.variable)}>
+    <html
+      lang="en-IN"
+      data-scroll-behavior="smooth"
+      className={cn("h-full antialiased", inter.variable)}
+    >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         {children}
       </body>

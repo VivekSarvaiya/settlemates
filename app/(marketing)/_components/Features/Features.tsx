@@ -12,23 +12,24 @@ export function Features() {
         <Reveal className="flex max-w-2xl flex-col gap-3">
           <span className="text-sm text-primary-text">Features</span>
           <h2 className="text-display-md font-medium">
-            Everything the bill needs, nothing it doesn&apos;t.
+            What it does today, and does well.
           </h2>
           <p className="text-lead text-muted-foreground">
-            SettleMates replaces the group-chat spreadsheet with one number
-            everybody can check.
+            One bill, up to 20 people, any mix of who paid what.
           </p>
         </Reveal>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {FEATURES.map((feature, index) => (
-            <Reveal key={feature.title} delay={(index % 3) * 0.08}>
-              <div className="flex h-full flex-col gap-3 border-t border-border pt-5">
-                <feature.icon
-                  aria-hidden="true"
-                  className="size-5 text-primary-text"
-                />
-                <h3 className="text-base font-medium">{feature.title}</h3>
+            <Reveal key={feature.title} delay={(index % 2) * 0.06}>
+              <div className="flex h-full flex-col gap-4 rounded border border-border p-6 md:p-8">
+                <span className="flex size-11 items-center justify-center rounded bg-primary/10">
+                  <feature.icon
+                    aria-hidden="true"
+                    className="size-5 text-primary-text"
+                  />
+                </span>
+                <h3 className="text-lg font-medium">{feature.title}</h3>
                 <p className="text-base text-muted-foreground">
                   {feature.description}
                 </p>
