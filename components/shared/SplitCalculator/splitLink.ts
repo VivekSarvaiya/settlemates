@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { ROUTES } from "@/config/routes";
 import {
   MAX_NAME_LENGTH,
@@ -8,22 +8,25 @@ import {
 } from "./const";
 import type { SharedPerson } from "./types";
 
+// Zod Mini, because this check ships to the browser and full Zod is far heavier.
 const sharedSplitSchema = z
   .array(
     z.tuple([
-      z.string().max(MAX_NAME_LENGTH),
-      z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+      z.string().check(z.maxLength(MAX_NAME_LENGTH)),
+      z.int().check(z.nonnegative(), z.maximum(Number.MAX_SAFE_INTEGER)),
     ]),
   )
-  .min(MIN_PARTICIPANTS)
-  .max(MAX_PARTICIPANTS)
-  .refine((people) => {
-    const total = people.reduce(
-      (sum, [, paidCents]) => sum + BigInt(paidCents),
-      BigInt(0),
-    );
-    return total > BigInt(0) && total <= BigInt(Number.MAX_SAFE_INTEGER);
-  });
+  .check(
+    z.minLength(MIN_PARTICIPANTS),
+    z.maxLength(MAX_PARTICIPANTS),
+    z.refine((people) => {
+      const total = people.reduce(
+        (sum, [, paidCents]) => sum + BigInt(paidCents),
+        BigInt(0),
+      );
+      return total > BigInt(0) && total <= BigInt(Number.MAX_SAFE_INTEGER);
+    }),
+  );
 
 // The split travels in the URL fragment, which browsers never send to the server.
 export function encodeSplit(people: SharedPerson[]): string {

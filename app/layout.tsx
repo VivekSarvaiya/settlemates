@@ -1,10 +1,13 @@
+import { OG_COLORS } from "@/components/shared/OgImage/const";
 import { env } from "@/config/env";
+import { inter } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+export const viewport: Viewport = {
+  themeColor: OG_COLORS.background,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.SITE_URL),

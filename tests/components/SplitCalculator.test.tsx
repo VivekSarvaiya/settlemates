@@ -290,6 +290,28 @@ describe("SplitCalculator", () => {
     expect(window.location.hash).toBe("#split=not-a-split");
   });
 
+  it("rejects shared links that break the split rules", () => {
+    const toHash = (people: { name: string; paidCents: number }[]) =>
+      `#split=${encodeSplit(people)}`;
+    const person = (paidCents: number, name = "Riya") => ({ name, paidCents });
+
+    expect(decodeSplitHash(toHash([person(100)]))).toEqual([person(100)]);
+    expect(decodeSplitHash(toHash([person(100, "R".repeat(40))]))).not.toBeNull();
+    expect(decodeSplitHash(toHash([person(100, "R".repeat(41))]))).toBeNull();
+    expect(decodeSplitHash(toHash([person(-100), person(300)]))).toBeNull();
+    expect(decodeSplitHash(toHash([person(10.5)]))).toBeNull();
+    expect(decodeSplitHash(toHash([person(0), person(0)]))).toBeNull();
+    expect(decodeSplitHash(toHash([]))).toBeNull();
+    expect(decodeSplitHash(toHash(Array.from({ length: 20 }, () => person(1))))).not.toBeNull();
+    expect(decodeSplitHash(toHash(Array.from({ length: 21 }, () => person(1))))).toBeNull();
+    expect(
+      decodeSplitHash(toHash([person(Number.MAX_SAFE_INTEGER), person(1)])),
+    ).toBeNull();
+    expect(
+      decodeSplitHash(`#split=${btoa(JSON.stringify([["Riya", "100"]]))}`),
+    ).toBeNull();
+  });
+
   it("offers the share sheet when the device has one", async () => {
     const user = userEvent.setup();
     const share = vi

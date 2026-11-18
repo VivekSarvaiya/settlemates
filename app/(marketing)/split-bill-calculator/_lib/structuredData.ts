@@ -30,7 +30,12 @@ export const buildCalculatorStructuredData = () => {
           "Shareable link that reopens the split",
         ],
         offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
-        publisher: { "@type": "Organization", name: "SettleMates", url: homeUrl },
+        publisher: {
+          "@type": "Organization",
+          "@id": `${homeUrl}#organization`,
+          name: "SettleMates",
+          url: homeUrl,
+        },
       },
       {
         "@type": "BreadcrumbList",

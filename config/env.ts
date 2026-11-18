@@ -1,7 +1,14 @@
 import { z } from "zod";
 
+const isVercelProduction = process.env.VERCEL_ENV === "production";
+
 const envSchema = z.object({
-  SITE_URL: z.url(),
+  SITE_URL: z
+    .url()
+    .refine(
+      (url) => !isVercelProduction || new URL(url).hostname !== "localhost",
+      "SITE_URL points to localhost in a production deploy. Set it to the real domain.",
+    ),
 });
 
 const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
