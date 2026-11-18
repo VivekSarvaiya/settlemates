@@ -7,9 +7,10 @@ import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/shared";
+import type { HeaderProps } from "./types";
 import { useHeader } from "./useHeader";
 
-export function Header() {
+export function Header({ isBlogVisible }: HeaderProps) {
   const {
     isScrolled,
     isOpen,
@@ -18,7 +19,7 @@ export function Header() {
     navItems,
     handleToggleOpen,
     handleNavigate,
-  } = useHeader();
+  } = useHeader({ isBlogVisible });
 
   return (
     <header
@@ -29,7 +30,7 @@ export function Header() {
     >
       <Container className="flex h-16 items-center justify-between gap-4">
         <Logo />
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => {
             const isActive = activeHref === item.href;
             return (
@@ -51,7 +52,7 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <Button
-            className="h-11 px-4 md:h-9"
+            className="h-11 px-4 lg:h-9"
             nativeButton={false}
             render={<Link href={ctaHref} />}
           >
@@ -61,7 +62,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-11 md:hidden"
+            className="size-11 lg:hidden"
             aria-expanded={isOpen}
             aria-controls="mobile-nav"
             aria-label={isOpen ? "Close menu" : "Open menu"}
@@ -83,7 +84,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18 }}
-            className="border-b border-border bg-background md:hidden"
+            className="border-b border-border bg-background lg:hidden"
           >
             <Container className="flex flex-col py-2">
               {navItems.map((item) => (

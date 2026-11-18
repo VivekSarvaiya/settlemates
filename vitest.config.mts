@@ -13,6 +13,8 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     include: ["tests/**/*.test.{ts,tsx}"],
+    // config/env.ts requires SITE_URL outside dev; pinned so SEO helpers build stable URLs.
+    env: { SITE_URL: "https://settlemates.test" },
     coverage: {
       provider: "v8",
       include: ["domains/expenses/split.ts", "domains/settlement/settle.ts"],

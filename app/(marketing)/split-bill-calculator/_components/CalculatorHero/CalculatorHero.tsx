@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { CheckCircle2, ChevronRight } from "lucide-react";
-import { SplitCalculator } from "@/components/shared";
+import { CheckCircle2 } from "lucide-react";
+import { Breadcrumb, SplitCalculator } from "@/components/shared";
 import { Container } from "@/components/ui/container";
 import { ROUTES } from "@/config/routes";
 import { CALCULATOR_PAGE } from "../../_lib/const";
@@ -13,24 +12,12 @@ export function CalculatorHero() {
       className="scroll-mt-16 border-b border-border py-8 md:py-16"
     >
       <Container className="flex flex-col gap-6 md:gap-8">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <li>
-              <Link
-                href={ROUTES.home}
-                className="rounded transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                Home
-              </Link>
-            </li>
-            <li aria-hidden="true">
-              <ChevronRight className="size-3.5" />
-            </li>
-            <li aria-current="page" className="text-foreground">
-              {CALCULATOR_PAGE.breadcrumb}
-            </li>
-          </ol>
-        </nav>
+        <Breadcrumb
+          items={[
+            { label: "Home", href: ROUTES.home },
+            { label: CALCULATOR_PAGE.breadcrumb },
+          ]}
+        />
 
         <div className="flex flex-col gap-8 md:grid md:grid-cols-2 md:items-start md:gap-14">
           <div className="contents md:flex md:flex-col md:gap-8">

@@ -1,9 +1,7 @@
 import type { MetadataRoute } from "next";
-import { env } from "@/config/env";
-import { ROUTES } from "@/config/routes";
+import { getAllPosts } from "@/lib/blog/posts";
+import { buildSitemap } from "@/lib/seo";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [ROUTES.home, ROUTES.splitBillCalculator].map((path) => ({
-    url: new URL(path, env.SITE_URL).toString(),
-  }));
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return buildSitemap(await getAllPosts());
 }

@@ -7,7 +7,6 @@ export default function Image() {
   return renderOgImage({
     eyebrow: "Split bill calculator",
     title: "See who owes whom, down to the paisa.",
-    example: "Priya pays you",
-    exampleAmount: "₹1,000",
+    example: { label: "Priya pays you", amount: "₹1,000" },
   });
 }

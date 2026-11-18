@@ -1,5 +1,3 @@
-export const SITE_NAME = "SettleMates";
-
 export const HOME_PAGE = {
   title: "SettleMates: Split Expenses With Friends, Free and Instant",
   description:

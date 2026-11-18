@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -12,4 +13,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Plugins are named as strings because Turbopack can't receive JavaScript functions.
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ["remark-gfm"],
+  },
+});
+
+export default withMDX(nextConfig);

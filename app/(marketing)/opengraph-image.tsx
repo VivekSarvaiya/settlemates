@@ -7,7 +7,6 @@ export default function Image() {
   return renderOgImage({
     eyebrow: "Split a bill in seconds",
     title: "Split expenses, not friendships.",
-    example: "Kabir pays you",
-    exampleAmount: "₹800",
+    example: { label: "Kabir pays you", amount: "₹800" },
   });
 }

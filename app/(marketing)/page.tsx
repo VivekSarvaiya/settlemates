@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/shared";
 import { ROUTES } from "@/config/routes";
+import { SITE_NAME, SITE_OG_LOCALE } from "@/config/site";
 import { ComingSoon, Faq, Features, Hero, HowItWorks } from "./_components";
-import { HOME_PAGE, SITE_NAME } from "./_lib/const";
+import { HOME_PAGE } from "./_lib/const";
 import { buildHomeStructuredData } from "./_lib/structuredData";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     type: "website",
     url: ROUTES.home,
     siteName: SITE_NAME,
-    locale: "en_IN",
+    locale: SITE_OG_LOCALE,
     title: HOME_PAGE.title,
     description: HOME_PAGE.description,
   },

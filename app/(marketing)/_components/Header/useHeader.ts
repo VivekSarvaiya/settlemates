@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { ROUTES } from "@/config/routes";
 import { NAV_ITEMS } from "./const";
+import type { HeaderProps } from "./types";
 
 const SCROLL_THRESHOLD = 8;
 
@@ -13,7 +14,7 @@ const subscribeToScroll = (onStoreChange: () => void) => {
 const getIsScrolled = () => window.scrollY > SCROLL_THRESHOLD;
 const getServerIsScrolled = () => false;
 
-export const useHeader = () => {
+export const useHeader = ({ isBlogVisible }: HeaderProps) => {
   const isScrolled = useSyncExternalStore(
     subscribeToScroll,
     getIsScrolled,
@@ -51,10 +52,14 @@ export const useHeader = () => {
 
   const ctaHref = `${pathname === ROUTES.splitBillCalculator ? ROUTES.splitBillCalculator : ROUTES.home}#quick-split`;
 
+  const navItems = NAV_ITEMS.filter((item) => isBlogVisible || !item.isBlogLink);
+
   const activeHref =
     pathname === ROUTES.home
       ? NAV_ITEMS.find((item) => item.sectionId === activeSection)?.href
-      : pathname;
+      : pathname.startsWith(`${ROUTES.blog}/`)
+        ? ROUTES.blog
+        : pathname;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -74,7 +79,7 @@ export const useHeader = () => {
     isOpen,
     activeHref,
     ctaHref,
-    navItems: NAV_ITEMS,
+    navItems,
     handleToggleOpen,
     handleNavigate,
   };

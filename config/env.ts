@@ -13,6 +13,9 @@ const envSchema = z.object({
 
 const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
+export const canShowDrafts =
+  process.env.NODE_ENV === "development" || process.env.VERCEL_ENV === "preview";
+
 // Falls back to Vercel's production domain, then localhost in dev only, so a build with no URL fails.
 export const env = envSchema.parse({
   SITE_URL:

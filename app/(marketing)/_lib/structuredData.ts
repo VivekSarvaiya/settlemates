@@ -1,13 +1,12 @@
-import { env } from "@/config/env";
 import { ROUTES } from "@/config/routes";
-import { BRAND_LOGO_PATH, HOME_PAGE, SITE_NAME } from "./const";
-
-const absoluteUrl = (path: string) => new URL(path, env.SITE_URL).toString();
+import { SITE_LANGUAGE, SITE_NAME } from "@/config/site";
+import { absoluteUrl, getOrganizationId } from "@/lib/seo";
+import { BRAND_LOGO_PATH, HOME_PAGE } from "./const";
 
 // WebSite is what Google reads to show "SettleMates" as the site name above results.
 export const buildHomeStructuredData = () => {
   const homeUrl = absoluteUrl(ROUTES.home);
-  const organizationId = `${homeUrl}#organization`;
+  const organizationId = getOrganizationId();
 
   return {
     "@context": "https://schema.org",
@@ -18,7 +17,7 @@ export const buildHomeStructuredData = () => {
         name: SITE_NAME,
         url: homeUrl,
         description: HOME_PAGE.description,
-        inLanguage: "en-IN",
+        inLanguage: SITE_LANGUAGE,
         publisher: { "@id": organizationId },
       },
       {

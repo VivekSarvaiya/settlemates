@@ -1,17 +1,11 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/shared";
-import { ROUTES } from "@/config/routes";
+import { SITE_NAME } from "@/config/site";
+import { FOOTER_LINK_GROUPS } from "./const";
+import type { FooterProps } from "./types";
 
-const FOOTER_LINKS = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "Features", href: "/#features" },
-  { label: "Coming soon", href: "/#coming-soon" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Split bill calculator", href: ROUTES.splitBillCalculator },
-] as const;
-
-export function Footer() {
+export function Footer({ isBlogVisible }: FooterProps) {
   return (
     <footer className="border-t border-border py-10">
       <Container className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
@@ -23,20 +17,27 @@ export function Footer() {
           </p>
         </div>
 
-        <nav aria-label="Footer" className="flex flex-col gap-3">
-          {FOOTER_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="w-fit text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {link.label}
-            </Link>
+        <nav aria-label="Footer" className="flex gap-12 md:gap-16">
+          {FOOTER_LINK_GROUPS.map((group) => (
+            <div key={group.label} className="flex flex-col gap-3">
+              <p className="text-sm font-medium">{group.label}</p>
+              {group.links
+                .filter((link) => isBlogVisible || !link.isBlogLink)
+                .map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="w-fit text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+            </div>
           ))}
         </nav>
 
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} SettleMates
+          © {new Date().getFullYear()} {SITE_NAME}
         </p>
       </Container>
     </footer>

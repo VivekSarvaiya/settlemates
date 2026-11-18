@@ -14,3 +14,7 @@ export const OG_COLORS = {
 };
 
 export const OG_HOOKS = "Free · No sign-up · Nothing saved";
+
+export const LONG_TITLE_LENGTH = 45;
+
+export const OG_ARTICLE_ALT = "A guide from the SettleMates blog";

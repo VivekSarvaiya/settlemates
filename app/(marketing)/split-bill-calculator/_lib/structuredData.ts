@@ -1,12 +1,10 @@
-import { env } from "@/config/env";
 import { ROUTES } from "@/config/routes";
+import { SITE_LANGUAGE } from "@/config/site";
+import { absoluteUrl, buildBreadcrumbList, getPublisherReference } from "@/lib/seo";
 import { CALCULATOR_FAQS } from "../_components/CalculatorFaq/const";
 import { CALCULATOR_PAGE } from "./const";
 
-const absoluteUrl = (path: string) => new URL(path, env.SITE_URL).toString();
-
 export const buildCalculatorStructuredData = () => {
-  const homeUrl = absoluteUrl(ROUTES.home);
   const pageUrl = absoluteUrl(ROUTES.splitBillCalculator);
 
   return {
@@ -21,7 +19,7 @@ export const buildCalculatorStructuredData = () => {
         applicationCategory: "FinanceApplication",
         operatingSystem: "Any",
         browserRequirements: "Requires JavaScript",
-        inLanguage: "en-IN",
+        inLanguage: SITE_LANGUAGE,
         isAccessibleForFree: true,
         featureList: [
           "Equal split of what each person paid",
@@ -30,25 +28,12 @@ export const buildCalculatorStructuredData = () => {
           "Shareable link that reopens the split",
         ],
         offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
-        publisher: {
-          "@type": "Organization",
-          "@id": `${homeUrl}#organization`,
-          name: "SettleMates",
-          url: homeUrl,
-        },
+        publisher: getPublisherReference(),
       },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: CALCULATOR_PAGE.breadcrumb,
-            item: pageUrl,
-          },
-        ],
-      },
+      buildBreadcrumbList([
+        { name: "Home", path: ROUTES.home },
+        { name: CALCULATOR_PAGE.breadcrumb, path: ROUTES.splitBillCalculator },
+      ]),
       {
         "@type": "FAQPage",
         "@id": `${pageUrl}#faq`,
