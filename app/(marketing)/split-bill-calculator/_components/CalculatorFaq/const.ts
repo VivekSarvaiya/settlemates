@@ -48,7 +48,7 @@ export const CALCULATOR_FAQS: CalculatorFaqEntry[] = [
   {
     question: "Do I need an account, and is my split saved?",
     answer:
-      "No account and no app. Nothing is saved on our servers: the split lives in your browser tab, and when you copy or share it, the link carries the split inside it so whoever opens it sees the same numbers.",
+      "No account and no app. Your split isn't saved on our servers: the split lives in your browser tab, and when you copy or share it, the link carries the split inside it so whoever opens it sees the same numbers.",
   },
   {
     question: "Which currency does it use?",

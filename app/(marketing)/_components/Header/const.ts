@@ -7,5 +7,4 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Coming soon", href: "/#coming-soon", sectionId: "coming-soon" },
   { label: "FAQ", href: "/#faq", sectionId: "faq" },
   { label: "Blog", href: ROUTES.blog, isBlogLink: true },
-  { label: "Split bill calculator", href: ROUTES.splitBillCalculator },
 ];

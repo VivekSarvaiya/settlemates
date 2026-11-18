@@ -3,7 +3,7 @@ import type { HeroHeadline } from "./types";
 export const HERO_HOOKS = [
   "No sign-up",
   "No app",
-  "Nothing saved",
+  "Splits never saved",
   "Free",
 ];
 

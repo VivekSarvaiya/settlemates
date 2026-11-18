@@ -13,7 +13,7 @@ export const OG_COLORS = {
   primaryTint: "#effaf8",
 };
 
-export const OG_HOOKS = "Free · No sign-up · Nothing saved";
+export const OG_HOOKS = "Free · No sign-up · Splits never saved";
 
 export const LONG_TITLE_LENGTH = 45;
 

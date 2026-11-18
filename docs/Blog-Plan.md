@@ -10,17 +10,17 @@
 
 ## 1. What was verified
 
-| Original assumption | What the repo actually has |
-|---|---|
-| Reuse `ShareBar` for sharing posts | ❌ `components/ui/share-bar.tsx` is a coloured proportion bar from the old calculator design and is unused. Posts need a new share button (Web Share API with a copy-link fallback). |
-| Tailwind is probably v4 | ✅ v4: `@import "tailwindcss"` and `@theme` in `app/globals.css`; there is no `tailwind.config`. Tailwind's default text sizes are **not** replaced, so `text-sm`/`text-base`/`text-lg` are Tailwind's stock 14/16/18px, not the 13/15/24px in `rules/tailwind.md` and the UIUX doc, and `text-xl` and similar still compile. Sticking to the allowed sizes is a review discipline, not a build-time guarantee. |
-| The UIUX doc allows a separate expressive type system for marketing | ❌ `docs/UIUX-Design.md` allows only 2 weights and 3 sizes. The marketing-only display tokens (`text-display-md`, `text-display-lg`, `text-lead`) are recorded in `AGENTS.md`. They are enough for the blog (see decision D3). |
-| The post reader goes in a route-local `_lib/posts.ts` | ❌ The sitemap and the RSS feed also need it. `rules/nextjs.md` says code used by more than one route belongs in `lib/`, not an `_` folder. |
-| Dependencies: `gray-matter`, `next-mdx-remote`, `reading-time`, rehype plugins, `@tailwindcss/typography` | ❌ `gray-matter` (last release 2021) and `reading-time` (last release 2022) are effectively unmaintained, which `AGENTS.md` rules out. Next.js 16 supports MDX itself through `@next/mdx`, so none of these are needed (see D1, D4). |
-| SEO plumbing exists | ✅ `JsonLd`, `OgImage`, `app/sitemap.ts`, `app/robots.ts`, `config/routes.ts`, `config/env.ts`, and the home page's `WebSite`/`Organization` structured data with the `#organization` id, which posts reference as publisher. |
-| No Privacy, Terms or About pages | ✅ None exist. `docs/SDLC-Roadmap.md` (Pre-Launch) already lists Privacy Policy and Terms of Service. |
-| No auth, API or database | ✅ Confirmed. The site is marketing-only. |
-| The blog is on the roadmap | ⚠️ It is not in the `AGENTS.md` Roadmap phases. It fits the "SEO *(parallel)*" track in `docs/SDLC-Roadmap.md`; add it there when the work starts. |
+| Original assumption                                                                                       | What the repo actually has                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reuse `ShareBar` for sharing posts                                                                        | ❌ `components/ui/share-bar.tsx` is a coloured proportion bar from the old calculator design and is unused. Posts need a new share button (Web Share API with a copy-link fallback).                                                                                                                                                                                                                            |
+| Tailwind is probably v4                                                                                   | ✅ v4: `@import "tailwindcss"` and `@theme` in `app/globals.css`; there is no `tailwind.config`. Tailwind's default text sizes are **not** replaced, so `text-sm`/`text-base`/`text-lg` are Tailwind's stock 14/16/18px, not the 13/15/24px in `rules/tailwind.md` and the UIUX doc, and `text-xl` and similar still compile. Sticking to the allowed sizes is a review discipline, not a build-time guarantee. |
+| The UIUX doc allows a separate expressive type system for marketing                                       | ❌ `docs/UIUX-Design.md` allows only 2 weights and 3 sizes. The marketing-only display tokens (`text-display-md`, `text-display-lg`, `text-lead`) are recorded in `AGENTS.md`. They are enough for the blog (see decision D3).                                                                                                                                                                                  |
+| The post reader goes in a route-local `_lib/posts.ts`                                                     | ❌ The sitemap and the RSS feed also need it. `rules/nextjs.md` says code used by more than one route belongs in `lib/`, not an `_` folder.                                                                                                                                                                                                                                                                     |
+| Dependencies: `gray-matter`, `next-mdx-remote`, `reading-time`, rehype plugins, `@tailwindcss/typography` | ❌ `gray-matter` (last release 2021) and `reading-time` (last release 2022) are effectively unmaintained, which `AGENTS.md` rules out. Next.js 16 supports MDX itself through `@next/mdx`, so none of these are needed (see D1, D4).                                                                                                                                                                            |
+| SEO plumbing exists                                                                                       | ✅ `JsonLd`, `OgImage`, `app/sitemap.ts`, `app/robots.ts`, `config/routes.ts`, `config/env.ts`, and the home page's `WebSite`/`Organization` structured data with the `#organization` id, which posts reference as publisher.                                                                                                                                                                                   |
+| No Privacy, Terms or About pages                                                                          | ✅ None exist. `docs/SDLC-Roadmap.md` (Pre-Launch) already lists Privacy Policy and Terms of Service.                                                                                                                                                                                                                                                                                                           |
+| No auth, API or database                                                                                  | ✅ Confirmed. The site is marketing-only.                                                                                                                                                                                                                                                                                                                                                                       |
+| The blog is on the roadmap                                                                                | ⚠️ It is not in the `AGENTS.md` Roadmap phases. It fits the "SEO _(parallel)_" track in `docs/SDLC-Roadmap.md`; add it there when the work starts.                                                                                                                                                                                                                                                              |
 
 ---
 
@@ -29,6 +29,7 @@
 **D1. MDX via Next's own `@next/mdx`.** Dependencies are `@next/mdx` (pinned to the installed Next version, 16.3.5), `@mdx-js/loader`, `@mdx-js/react`, `@types/mdx`, and `remark-gfm` (for tables). Posts are loaded by dynamic import, the pattern in the Next.js 16 MDX guide. Turbopack only accepts plugins given as strings, so pass `'remark-gfm'` by name. `.mdx` is not added to `pageExtensions`, so MDX files never become routes on their own.
 
 **D2. One folder per post: `content/blog/<slug>/` holding `meta.ts`, `index.mdx` and the post's images.**
+
 - The post's details live in `meta.ts` as `export const meta = { … } satisfies PostMetaInput`. TypeScript checks them while writing, and the Zod schema checks them again when the post loads, so a bad post fails the build. No front-matter library is needed.
 - `meta.ts` is separate from `index.mdx` on purpose: listing posts (layout, sitemap, feed, index) only imports `meta.ts`, so MDX and the components posts use stay off every other page (see section 8).
 - The hero image is imported in `meta.ts`, so `next/image` gets real width and height and the page doesn't shift as it loads.
@@ -36,18 +37,19 @@
 
 **D3. No Tailwind typography plugin.** Its defaults use weights 600–800 and its own size scale, which break the design system. Each markdown element gets a styled component using tokens that already exist:
 
-| Element | Class |
-|---|---|
-| Post title (H1) | `text-display-lg font-medium` (40→68px) |
-| H2 | `text-display-md font-medium` (28→40px, the same size as section headings elsewhere on the site) |
-| H3 | `text-lead font-medium` (same size as body; set apart by weight, per the UIUX doc) |
-| Body, lists, quotes | `text-lead` |
-| Captions, dates, metadata | `text-sm` |
-| Inline code | `bg-muted rounded px-1`, Inter (no mono font is loaded) |
+| Element                   | Class                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| Post title (H1)           | `text-display-lg font-medium` (40→68px)                                                          |
+| H2                        | `text-display-md font-medium` (28→40px, the same size as section headings elsewhere on the site) |
+| H3                        | `text-lead font-medium` (same size as body; set apart by weight, per the UIUX doc)               |
+| Body, lists, quotes       | `text-lead`                                                                                      |
+| Captions, dates, metadata | `text-sm`                                                                                        |
+| Inline code               | `bg-muted rounded px-1`, Inter (no mono font is loaded)                                          |
 
 The reading column is `max-w-2xl` (about 672px), inside the UIUX doc's 640–720px range. No new tokens are added.
 
 **D4. No libraries for small jobs.**
+
 - **Reading time** is word count ÷ 200, rounded up.
 - **Table of contents:** `##` and `###` headings are read from the raw `.mdx` text. The heading component and the table of contents share one slug function, so their ids always match. Two headings with the same slug fail the build.
 - **Images:** plain markdown images (`![]()`) fail the build with "use `<Figure>`", so every image goes through `next/image`.
@@ -56,6 +58,7 @@ The reading column is `max-w-2xl` (about 672px), inside the UIUX doc's 640–720
 **D5. Drafts.** `meta.draft: true` posts show in `pnpm dev` and on Vercel preview deployments, and are hidden in production builds. They always render with `robots: noindex`. The flag is derived in `config/env.ts` (`NODE_ENV === "development"` or `VERCEL_ENV === "preview"`).
 
 **D6. The blog stays hidden until the first published post.** With zero published posts:
+
 - `/blog` renders an empty state with `noindex`.
 - `/blog` is left out of the sitemap.
 - The Blog links don't appear in the header or footer.
@@ -66,11 +69,12 @@ The first published post turns all three on automatically, which avoids launchin
 
 **D8. Authors are shown on the About page, not on separate author pages.** Author records live in `content/authors.ts`. The author box and `BlogPosting.author.url` link to `/about#<authorId>`.
 
-**D9. About, Privacy and Terms have their own layouts, not the blog's.** About is a landing-style page built from components and `const.ts` data in `app/(marketing)/about/_components/`: hero with key facts, principles, today vs. next (reusing the home page's `UPCOMING_MODES`), the founder card with the `#founder` anchor, and a dark contact band. Privacy and Terms share `components/shared/LegalPage`: a muted header band with summary and last-updated date, "at a glance" cards, a numbered contents list (sticky on desktop), and smaller document type via `LEGAL_MDX_COMPONENTS`. Their text stays in `content/pages/{privacy,terms}.mdx`. Sections must be numbered `## 1. …`, `## 2. …` (a test enforces it), and the contents list is read from those headings by `lib/contentPages.ts`. The text describes the site as it is today: no accounts, no cookies, no analytics, nothing stored on our servers. It is a draft for the owner to review, not legal advice.
+**D9. About, Privacy and Terms have their own layouts, not the blog's.** About is a landing-style page built from components and `const.ts` data in `app/(marketing)/about/_components/`: hero with key facts, principles, today vs. next (reusing the home page's `UPCOMING_MODES`), the founder card with the `#founder` anchor, and a dark contact band. Privacy and Terms share `components/shared/LegalPage`: a muted header band with summary and last-updated date, "at a glance" cards, a numbered contents list (sticky on desktop), and smaller document type via `LEGAL_MDX_COMPONENTS`. Their text stays in `content/pages/{privacy,terms}.mdx`. Sections must be numbered `## 1. …`, `## 2. …` (a test enforces it), and the contents list is read from those headings by `lib/contentPages.ts`. The text describes the site as it will launch: no accounts, the split never stored on our servers, and analytics (owner decision, 2026-11-18) that never receives split data. Site copy only claims things about the split itself, never "no cookies" or "no tracking". It is a draft for the owner to review, not legal advice.
 
 **D10. Optional `<QuickSplit />` component** that embeds the real calculator inside an article. It isn't in the global MDX component list: a post imports it at the top (`import { QuickSplit } from "@/components/mdx/QuickSplit/QuickSplit"`), and it lazy-loads the calculator with `next/dynamic`.
 
 **D11. Consolidation done as part of this work:**
+
 - **`config/site.ts`:** `SITE_NAME` and locale, moved from `app/(marketing)/_lib/const.ts`.
 - **`lib/seo.ts`:** `absoluteUrl` and the organisation reference, now that home, calculator and blog all need them.
 - **`components/shared/Breadcrumb`:** used by blog posts, and the calculator page switches to it.
@@ -162,6 +166,7 @@ Every component folder follows the `Feature.tsx` / `useFeature.ts` / `types.ts` 
 11. Read next (full-width band): "Keep reading" with up to 3 related posts (same category first, then newest) and an "All guides" link, then "Quick links" to the calculator, all guides, How it works and the FAQ (`[slug]/_components/QuickLinks/const.ts`)
 
 **Behind the page:**
+
 - `generateStaticParams` pre-builds every visible post. Unknown slugs and production drafts reach `notFound()` and return a real 404 with `noindex`.
 - `generateMetadata` sets:
   - title, description, canonical URL;
@@ -203,7 +208,7 @@ Update `AGENTS.md` (Current State and Roadmap) and `MEMORY.md` when done. Commit
 
 1. **Author:** one author, the founder. Until the real details are in, `content/authors.ts` holds a clearly marked placeholder: name **"Name"**, role **"Founder of SettleMates"**, a placeholder bio and initials instead of a photo. Replace them with the real name, a 2–3 sentence bio and a photo **before publishing the first post**. Google weighs real authorship heavily for money topics.
 2. **Operator:** an individual, not a company. The contact email is a placeholder (`CONTACT_EMAIL` in `config/site.ts`, set to an `example.com` address). Replace it before launch; the About, Privacy and Terms pages read it from that one place.
-3. **Ads:** AdSense is later, not now. The trust pages describe today's site: no accounts, no cookies, no analytics, nothing stored on our servers. Before applying for AdSense:
+3. **Ads:** AdSense is later, not now. Analytics will be added before launch (2026-11-18), so the trust pages already describe it and make no "no cookies" or "no tracking" claims. Before applying for AdSense:
    - update the Privacy page (third-party cookies, Google as a vendor);
    - qualify "Private by default" in the Features and FAQ copy;
    - add a Google-certified consent banner for EEA and UK visitors;
@@ -214,6 +219,9 @@ Update `AGENTS.md` (Current State and Roadmap) and `MEMORY.md` when done. Commit
 - [ ] Author name, bio and photo in `content/authors.ts`
 - [ ] `CONTACT_EMAIL` in `config/site.ts`
 - [ ] Owner review of `content/pages/privacy.mdx` and `content/pages/terms.mdx`
+- [ ] Analytics is live before launch. The Privacy page (section 3) already says the site uses it; launching without it makes that section wrong.
+- [ ] Analytics drops the URL fragment (`#split=…`) from every captured URL and event before anything leaves the browser, and never records calculator inputs or session replays of them. The Privacy page promises this, and the fragment holds the names and amounts.
+- [ ] Name the analytics provider in `content/pages/privacy.mdx` section 3 and confirm whether it sets cookies; adjust "may use a cookie" to match.
 - [x] Placeholder draft post deleted; replaced by three real posts (section 10)
 - [ ] Before deploying: the three posts are published (`draft: false`) under the placeholder author "Name". Replace the author first, or set `draft: true` until you do.
 
@@ -257,13 +265,13 @@ Update `AGENTS.md` (Current State and Roadmap) and `MEMORY.md` when done. Commit
 
    export const meta = {
      title: "How to split rent fairly with flatmates", // 10–70 characters
-     description: "…",                                  // 50–160 characters
-     publishedAt: "2026-12-01",                         // YYYY-MM-DD
-     updatedAt: "2026-12-05",                           // optional, not before publishedAt
-     category: "Flatmates",                             // Guides | Trips | Flatmates | Money basics
+     description: "…", // 50–160 characters
+     publishedAt: "2026-12-01", // YYYY-MM-DD
+     updatedAt: "2026-12-05", // optional, not before publishedAt
+     category: "Flatmates", // Guides | Trips | Flatmates | Money basics
      authorId: "founder",
-     draft: true,                                       // flip to false (or remove) to publish
-     image: { src: hero, alt: "…" },                    // optional
+     draft: true, // flip to false (or remove) to publish
+     image: { src: hero, alt: "…" }, // optional
    } satisfies PostMetaInput;
    ```
 
@@ -278,13 +286,14 @@ Update `AGENTS.md` (Current State and Roadmap) and `MEMORY.md` when done. Commit
 
 Written as models for future posts. Each one shows a different pattern worth copying:
 
-| Post | Category | What it demonstrates |
-|---|---|---|
-| `split-rent-fairly-unequal-rooms` | Flatmates | One running example used across three methods; tables with right-aligned ₹ columns; a `tip` and a `warning` callout; a quoted message readers can copy |
-| `split-group-trip-expenses` | Trips | Before, during and after structure; a worked settlement that matches the calculator's own answer (checked in the browser); the embedded `<QuickSplit />` |
-| `ask-friend-to-pay-you-back` | Money basics | Ready-to-send message scripts as blockquotes; an internal link to another post; the `<Disclaimer />` for a post about lending money |
+| Post                              | Category     | What it demonstrates                                                                                                                                     |
+| --------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `split-rent-fairly-unequal-rooms` | Flatmates    | One running example used across three methods; tables with right-aligned ₹ columns; a `tip` and a `warning` callout; a quoted message readers can copy   |
+| `split-group-trip-expenses`       | Trips        | Before, during and after structure; a worked settlement that matches the calculator's own answer (checked in the browser); the embedded `<QuickSplit />` |
+| `ask-friend-to-pay-you-back`      | Money basics | Ready-to-send message scripts as blockquotes; an internal link to another post; the `<Disclaimer />` for a post about lending money                      |
 
 House style they follow:
+
 - **Talk to one reader.** Use "you" and a concrete moment ("You paid for dinner on Friday…"). No invented personal stories attributed to the author.
 - **Use real ₹ numbers and make them add up.** Every worked example totals correctly; check the maths before publishing.
 - **Short paragraphs, plain words, headings that say what the section answers.**

@@ -86,3 +86,13 @@ export type SplitCalculatorState = ReturnType<typeof useSplitCalculator>;
 export interface CalculatorCardProps {
   calculator: SplitCalculatorState;
 }
+
+export interface ShareMessageInput {
+  names: string[];
+  paidCents: number[];
+  balancesCents: number[];
+  transactions: SettlementTransaction[];
+  totalCents: number;
+  shareCents: number;
+  link: string;
+}

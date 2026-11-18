@@ -11,11 +11,7 @@ import {
   computeSettlement,
   type SettlementTransaction,
 } from "@/domains/settlement/settle";
-import {
-  formatAmountInput,
-  formatCents,
-  parseAmountToCents,
-} from "@/lib/currency";
+import { formatAmountInput, parseAmountToCents } from "@/lib/currency";
 import {
   DEFAULT_NAMES,
   DEFAULT_PEOPLE_COUNT,
@@ -23,7 +19,7 @@ import {
   MIN_PARTICIPANTS,
 } from "./const";
 import { displayName } from "./displayName";
-import { describeBalance, describePayment } from "./phrases";
+import { buildShareMessage } from "./shareMessage";
 import { buildSplitUrl, decodeSplitHash } from "./splitLink";
 import type {
   CalculatorStage,
@@ -199,44 +195,24 @@ export const useSplitCalculator = () => {
     return () => clearTimeout(timer);
   }, [copyStatus]);
 
-  const buildShareText = () => {
-    const nameAt = (index: number) =>
-      displayName(participants[index]?.name ?? "", index);
-    const rows = participants.map((_, index) => {
-      const paid = contributionSummary.paidCents[index] ?? 0;
-      return `${nameAt(index)} paid ${formatCents(paid)} · ${describeBalance(balancesCents[index] ?? 0).text}`;
+  const buildShareText = () =>
+    buildShareMessage({
+      names: participants.map((participant, index) =>
+        displayName(participant.name, index),
+      ),
+      paidCents: contributionSummary.paidCents,
+      balancesCents,
+      transactions: settlements,
+      totalCents,
+      shareCents: equalSummary.baseShareCents,
+      link: buildSplitUrl(
+        window.location.origin,
+        participants.map((participant, index) => ({
+          name: participant.name,
+          paidCents: contributionSummary.paidCents[index] ?? 0,
+        })),
+      ),
     });
-    const payments =
-      settlements.length > 0
-        ? [
-            "Who pays whom",
-            ...settlements.map(
-              (transaction) =>
-                `${describePayment(nameAt(transaction.fromIndex), nameAt(transaction.toIndex))} ${formatCents(transaction.amountCents)}`,
-            ),
-          ]
-        : ["Everyone's square — no payments needed."];
-    const link = buildSplitUrl(
-      window.location.origin,
-      participants.map((participant, index) => ({
-        name: participant.name,
-        paidCents: contributionSummary.paidCents[index] ?? 0,
-      })),
-    );
-
-    return [
-      `${formatCents(totalCents)} split between ${participants.length} ${
-        participants.length === 1 ? "person" : "people"
-      }`,
-      `Each person's share: ${formatCents(equalSummary.baseShareCents)}`,
-      "",
-      ...rows,
-      "",
-      ...payments,
-      "",
-      `Open this split on SettleMates: ${link}`,
-    ].join("\n");
-  };
 
   const handlePeopleChange = (delta: number) => {
     setParticipants((current) => {

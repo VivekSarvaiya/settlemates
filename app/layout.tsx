@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s — SettleMates",
   },
   description:
-    "Type what everyone paid and see who pays whom in seconds. Free, no sign-up, nothing saved.",
+    "Type what everyone paid and see who pays whom in seconds. Free, no sign-up, and your split is never saved.",
   openGraph: {
     siteName: "SettleMates",
     type: "website",

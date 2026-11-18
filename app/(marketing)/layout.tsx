@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { MotionProvider } from "@/components/ui/motion-provider";
 import { getAllPosts } from "@/lib/blog/posts";
-import { Footer, Header } from "./_components";
+import { Footer } from "./_components/Footer/Footer";
+import { Header } from "./_components/Header/Header";
 
 export default async function MarketingLayout({ children }: { children: ReactNode }) {
   const isBlogVisible = (await getAllPosts()).length > 0;
