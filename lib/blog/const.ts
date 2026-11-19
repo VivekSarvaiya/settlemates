@@ -15,6 +15,7 @@ export const WORDS_PER_MINUTE = 200;
 export const RELATED_POST_LIMIT = 3;
 export const LATEST_POST_LIMIT = 3;
 export const MIN_TOC_HEADINGS = 2;
+export const POST_ARTICLE_ID = "post-article";
 
 export const POST_TITLE_LENGTH = { min: 10, max: 70 } as const;
 export const POST_DESCRIPTION_LENGTH = { min: 50, max: 160 } as const;

@@ -1,17 +1,18 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
 import { CtaCard } from "@/components/mdx";
 import { JsonLd } from "@/components/shared";
 import { Container } from "@/components/ui/container";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { authorPath, blogPostPath } from "@/config/routes";
 import { SITE_NAME, SITE_OG_LOCALE } from "@/config/site";
 import { AUTHORS } from "@/content/authors";
-import { RELATED_POST_LIMIT } from "@/lib/blog/const";
+import { POST_ARTICLE_ID, RELATED_POST_LIMIT } from "@/lib/blog/const";
 import { loadPostContent } from "@/lib/blog/content";
 import { getAllPosts, getPostBySlug } from "@/lib/blog/posts";
 import { getLastModified, getRelatedPosts } from "@/lib/blog/select";
 import { absoluteUrl } from "@/lib/seo";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 import {
   AuthorBox,
   PostHeader,
@@ -62,19 +63,25 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPostPage({ params }: PageProps<"/blog/[slug]">) {
+export default async function BlogPostPage({
+  params,
+}: PageProps<"/blog/[slug]">) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const [Content, allPosts] = await Promise.all([loadPostContent(slug), getAllPosts()]);
+  const [Content, allPosts] = await Promise.all([
+    loadPostContent(slug),
+    getAllPosts(),
+  ]);
   const author = AUTHORS[post.meta.authorId];
   const relatedPosts = getRelatedPosts(post, allPosts, RELATED_POST_LIMIT);
 
   return (
     <>
       <JsonLd data={buildPostStructuredData(post, author)} />
-      <article className="py-10 md:py-16">
+      <ScrollProgress targetId={POST_ARTICLE_ID} className="top-16" />
+      <article id={POST_ARTICLE_ID} className="py-10 md:py-16">
         <Container className="flex flex-col gap-10 md:gap-12">
           <PostHeader post={post} author={author} />
 
@@ -87,12 +94,17 @@ export default async function BlogPostPage({ params }: PageProps<"/blog/[slug]">
                   sizes="(min-width: 1024px) 860px, 100vw"
                   loading="eager"
                   fetchPriority="high"
-                  placeholder={post.meta.image.src.blurDataURL ? "blur" : "empty"}
+                  placeholder={
+                    post.meta.image.src.blurDataURL ? "blur" : "empty"
+                  }
                   className="h-auto w-full rounded border border-border"
                 />
               )}
               <div className="lg:hidden">
-                <TableOfContents headings={post.headings} variant="collapsible" />
+                <TableOfContents
+                  headings={post.headings}
+                  variant="collapsible"
+                />
               </div>
               <div className="flex max-w-2xl flex-col gap-6">
                 <Content />
