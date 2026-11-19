@@ -1,3 +1,4 @@
+import { MAX_PARTICIPANTS } from "@/components/shared/SplitCalculator/const";
 import type { AboutFact } from "./types";
 
 export const ABOUT_HERO = {
@@ -9,6 +10,6 @@ export const ABOUT_HERO = {
 export const ABOUT_FACTS: AboutFact[] = [
   { value: "₹0", label: "to use" },
   { value: "0", label: "accounts or apps needed" },
-  { value: "20", label: "people in one split" },
+  { value: String(MAX_PARTICIPANTS), label: "people in one split" },
   { value: "n − 1", label: "the most payments a group of n ever needs" },
 ];

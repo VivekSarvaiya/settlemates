@@ -8,9 +8,9 @@ When you copy or share a split, the names and amounts are packed into the link i
 
 ## 3. Analytics
 
-We use analytics to understand how SettleMates is used, so we can make it better. It records things like which pages are visited, which site or search brought you here, your approximate location (country or city, worked out from your IP address), and your device and browser type. It never receives the names or amounts in a split.
+We use Vercel Web Analytics and Vercel Speed Insights, from the company that hosts the site, to understand how SettleMates is used and how fast it loads. They record things like the page you visited, the site or search that brought you here, your approximate location (country, and sometimes region or city, worked out from your IP address), your device, operating system and browser, and how quickly the page loaded. They never receive the names or amounts in a split: the part of the address after the # sign is removed before anything is sent.
 
-Analytics may use a cookie or similar storage in your browser to tell a returning visitor from a new one. We don't use it to find out who you are, and we don't sell what it records.
+Vercel Web Analytics doesn't use third-party cookies. To count unique visitors, it creates a hash from your request and discards it after 24 hours. Speed Insights records its measurements anonymously, without linking them to you or your IP address. We don't use analytics to find out who you are, and we don't sell what it records.
 
 ## 4. Hosting
 

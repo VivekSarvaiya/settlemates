@@ -1,5 +1,5 @@
 export const MIN_PARTICIPANTS = 1;
-export const MAX_PARTICIPANTS = 20;
+export const MAX_PARTICIPANTS = 50;
 export const DEFAULT_PEOPLE_COUNT = 4;
 export const MAX_NAME_LENGTH = 40;
 

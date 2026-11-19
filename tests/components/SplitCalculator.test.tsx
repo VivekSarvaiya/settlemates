@@ -302,8 +302,8 @@ describe("SplitCalculator", () => {
     expect(decodeSplitHash(toHash([person(10.5)]))).toBeNull();
     expect(decodeSplitHash(toHash([person(0), person(0)]))).toBeNull();
     expect(decodeSplitHash(toHash([]))).toBeNull();
-    expect(decodeSplitHash(toHash(Array.from({ length: 20 }, () => person(1))))).not.toBeNull();
-    expect(decodeSplitHash(toHash(Array.from({ length: 21 }, () => person(1))))).toBeNull();
+    expect(decodeSplitHash(toHash(Array.from({ length: 50 }, () => person(1))))).not.toBeNull();
+    expect(decodeSplitHash(toHash(Array.from({ length: 51 }, () => person(1))))).toBeNull();
     expect(
       decodeSplitHash(toHash([person(Number.MAX_SAFE_INTEGER), person(1)])),
     ).toBeNull();

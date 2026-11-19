@@ -1,7 +1,12 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import { SECURITY_HEADERS } from "./config/securityHeaders";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
+  },
   async redirects() {
     return [
       {

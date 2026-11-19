@@ -7,7 +7,7 @@ export const PRIVACY_PAGE = {
     "What happens to your information on SettleMates: no account, your split never stored on our servers, and what our analytics can and can't see.",
   summary:
     "SettleMates is a free calculator, not an account-based app. This page explains, in plain language, what happens to your information when you use it.",
-  updatedAt: "2026-11-18",
+  updatedAt: "2026-11-19",
 } as const;
 
 export const PRIVACY_HIGHLIGHTS: LegalHighlight[] = [

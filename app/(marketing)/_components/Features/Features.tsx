@@ -1,3 +1,4 @@
+import { MAX_PARTICIPANTS } from "@/components/shared/SplitCalculator/const";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
 import { env } from "@/config/env";
@@ -18,7 +19,7 @@ export function Features() {
             What it does today, and does well.
           </h2>
           <p className="text-lead text-muted-foreground">
-            One bill, up to 20 people, any mix of who paid what. Every tile
+            One bill, up to {MAX_PARTICIPANTS} people, any mix of who paid what. Every tile
             below runs the same engine as the calculator, so go ahead and play.
           </p>
         </Reveal>

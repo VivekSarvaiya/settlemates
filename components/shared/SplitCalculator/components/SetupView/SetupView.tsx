@@ -92,26 +92,24 @@ export function SetupView({
         </ul>
       </div>
 
-      <dl
-        role="group"
-        aria-label="Split summary"
-        className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/40 px-4 py-3"
-      >
-        <div className="flex flex-col gap-0.5">
-          <dt className="text-sm text-muted-foreground">Total paid</dt>
-          <dd className="text-lg font-medium tabular-nums">
-            {formatCents(totalCents)}
-          </dd>
-        </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <dt className="text-sm text-muted-foreground">
-            Each person&apos;s share
-          </dt>
-          <dd className="text-lg font-medium tabular-nums">
-            {formatCents(equalShareCents)}
-          </dd>
-        </div>
-      </dl>
+      <div role="group" aria-label="Split summary">
+        <dl className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/40 px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-sm text-muted-foreground">Total paid</dt>
+            <dd className="text-lg font-medium tabular-nums">
+              {formatCents(totalCents)}
+            </dd>
+          </div>
+          <div className="flex flex-col items-end gap-0.5">
+            <dt className="text-sm text-muted-foreground">
+              Each person&apos;s share
+            </dt>
+            <dd className="text-lg font-medium tabular-nums">
+              {formatCents(equalShareCents)}
+            </dd>
+          </div>
+        </dl>
+      </div>
 
       <p
         aria-live="polite"

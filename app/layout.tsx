@@ -1,4 +1,5 @@
 import { OG_COLORS } from "@/components/shared/OgImage/const";
+import { SiteAnalytics } from "@/components/shared/SiteAnalytics/SiteAnalytics";
 import { env } from "@/config/env";
 import { inter } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         {children}
+        <SiteAnalytics />
       </body>
     </html>
   );
