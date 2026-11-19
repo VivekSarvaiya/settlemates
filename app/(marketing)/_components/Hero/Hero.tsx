@@ -3,6 +3,7 @@
 import { Check } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Container } from "@/components/ui/container";
+import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
 import { SplitCalculatorCard } from "@/components/shared";
 import { EASE_OUT } from "@/lib/animation";
 import { HERO_HOOKS } from "./const";
@@ -14,9 +15,24 @@ export function Hero() {
   return (
     <section
       id="quick-split"
-      className="scroll-mt-16 border-b border-border py-10 md:py-20"
+      className="relative scroll-mt-16 border-b border-border py-10 md:py-20"
     >
-      <Container className="grid items-start gap-8 md:grid-cols-2 md:gap-14">
+      <DottedGlowBackground
+        className="pointer-events-none mask-radial-to-90% mask-radial-at-center opacity-20 dark:opacity-100"
+        opacity={1}
+        gap={10}
+        radius={1.6}
+        colorLightVar="--primary"
+        glowColorLightVar="--primary"
+        colorDarkVar="--primary"
+        glowColorDarkVar="--primary"
+        backgroundOpacity={0}
+        speedMin={0.3}
+        speedMax={1.6}
+        speedScale={1}
+      />
+
+      <Container className="relative z-10 grid items-start gap-8 md:grid-cols-2 md:gap-14">
         <div className="flex flex-col items-start gap-5 md:sticky md:top-28">
           <ul
             aria-label="Why SettleMates"

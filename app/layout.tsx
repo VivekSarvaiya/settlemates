@@ -2,6 +2,7 @@ import { OG_COLORS } from "@/components/shared/OgImage/const";
 import { SiteAnalytics } from "@/components/shared/SiteAnalytics/SiteAnalytics";
 import { env } from "@/config/env";
 import { inter } from "@/lib/fonts";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -33,7 +34,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en-IN"
       data-scroll-behavior="smooth"
       className={cn("h-full antialiased", inter.variable)}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         {children}
         <SiteAnalytics />

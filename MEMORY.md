@@ -65,7 +65,6 @@ Carried from `docs/TechDesign-MVP.md` — these need a product decision, not a c
 - Notification channels beyond in-app/email — is push in scope for MVP or later?
 - Budget (~$47/mo) and 12–14 week timeline — carried from early project context, not reconfirmed recently
 
-
 ---
 
 ## Next Session Starting Point
@@ -74,5 +73,8 @@ Carried from `docs/TechDesign-MVP.md` — these need a product decision, not a c
 2. **Visual QA of the calculators is unverified** — `pnpm dev` and click through both `/` and `/calculator`: setup (people stepper + paid inputs, including 12-person contributions) → split → edit payments → copy → start over, plus mobile viewport and keyboard-only navigation. Confirm the derived total and equal share update live, "Who pays whom" appears when someone owes someone, and the "Everyone's square" note appears when contributions match shares. Check the `#how-to-split` / `#how-it-works` / `#features` / `#faq` anchors against the sticky header offset (`scroll-mt-20`).
 3. **Tests now exist.** `pnpm test` runs Vitest (domain split, settlement, schemas, and Quick Split RTL flows); `pnpm run test:coverage` enforces thresholds on `domains/expenses/split.ts` and `domains/settlement/settle.ts`. Keep this suite green as the expense API starts consuming the domain.
 4. Then move into the real Phase 1 work: Supabase project, Prisma schema, auth wiring, CI/CD.
+
 - **2026-11-19** — Owner chose Vercel Web Analytics (+ Speed Insights). Wired with `beforeSend` stripping `#split=`, which was verified in dev. Privacy section 3 names Vercel and its real data handling (no third-party cookies; a request hash discarded after 24 h). `public/globe.svg` deleted. Production builds stay on Turbopack (webpack switch not decided).
 - **2026-11-19** — Quick Split cap raised from 20 to 50 people at the owner's request (`MAX_PARTICIPANTS`; the share-link schema reads the same constant, so links with 21–50 people now open). The About facts, About roadmap and home Features copy now read the constant instead of a hard-coded "20".
+- **2026-11-19** — Added `components/ui/dotted-glow-background.tsx` (Aceternity `DottedGlowBackground`, copied as-is at the owner's request) behind the home Hero, in the theme teal (`--primary` for dots and glow). The site has no dark mode, so the layer stays at `opacity-20`. A replica of one frame measured ~9 ms for ~10k dots at 1024 px wide.
+- **2026-11-19** — Dark mode added at the owner's request: Magic UI `AnimatedThemeToggler` in the header (bar from `sm` up, "Theme" row in the mobile menu below `sm`), saved as `theme` in localStorage, applied before first paint by `THEME_INIT_SCRIPT` in the root `<head>` (saved choice, else system). Dark `--primary-text` brightened to teal-500 for contrast; a text-contrast sweep of every page passes in both themes.

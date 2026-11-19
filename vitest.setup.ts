@@ -29,6 +29,9 @@ class MockResizeObserver {
 vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 vi.stubGlobal("ResizeObserver", MockResizeObserver);
 
+// jsdom has no canvas; returning null takes the Hero background's "no 2D context" path quietly.
+HTMLCanvasElement.prototype.getContext = () => null;
+
 vi.stubGlobal(
   "matchMedia",
   vi.fn((query: string) => ({

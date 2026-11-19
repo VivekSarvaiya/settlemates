@@ -20,7 +20,7 @@ export const AVATAR_TINTS = [
   "bg-primary/10 text-primary-text",
   "bg-foreground/10 text-foreground",
   "bg-secondary text-secondary-foreground",
-  "bg-muted text-muted-foreground",
+  "bg-muted text-foreground",
   "bg-primary/15 text-primary-text",
   "bg-foreground/5 text-foreground",
 ];

@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, Menu, X } from "lucide-react";
-import { cn } from "cn";
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/shared";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { cn } from "cn";
+import { ArrowRight, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import type { HeaderProps } from "./types";
 import { useHeader } from "./useHeader";
 
@@ -37,7 +38,9 @@ export function Header({ isBlogVisible }: HeaderProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={isActive ? (item.sectionId ? "true" : "page") : undefined}
+                aria-current={
+                  isActive ? (item.sectionId ? "true" : "page") : undefined
+                }
                 className={cn(
                   "rounded px-3 py-2 text-sm transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                   isActive
@@ -51,11 +54,13 @@ export function Header({ isBlogVisible }: HeaderProps) {
           })}
         </nav>
         <div className="flex items-center gap-2">
-          <Button
-            className="h-11 px-4 lg:h-9"
-            nativeButton={false}
-            render={<Link href={ctaHref} />}
-          >
+          <AnimatedThemeToggler
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "hidden size-11 sm:inline-flex lg:size-9",
+            )}
+          />
+          <Button nativeButton={false} render={<Link href={ctaHref} />}>
             Try it now
             <ArrowRight aria-hidden="true" data-icon="inline-end" />
           </Button>
@@ -68,11 +73,7 @@ export function Header({ isBlogVisible }: HeaderProps) {
             aria-label={isOpen ? "Close menu" : "Open menu"}
             onClick={handleToggleOpen}
           >
-            {isOpen ? (
-              <X aria-hidden="true" />
-            ) : (
-              <Menu aria-hidden="true" />
-            )}
+            {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </Button>
         </div>
       </Container>
@@ -97,6 +98,15 @@ export function Header({ isBlogVisible }: HeaderProps) {
                   {item.label}
                 </Link>
               ))}
+              <div className="mt-2 flex items-center justify-between border-t border-border px-1 pt-2 sm:hidden">
+                <span className="text-base text-muted-foreground">Theme</span>
+                <AnimatedThemeToggler
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "size-11",
+                  )}
+                />
+              </div>
             </Container>
           </motion.div>
         )}

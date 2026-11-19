@@ -107,6 +107,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -115,7 +116,7 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.437 0.078 188.216);
   --primary-foreground: oklch(0.984 0.014 180.72);
-  --primary-text: oklch(0.437 0.078 188.216);
+  --primary-text: oklch(0.704 0.14 182.503);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -156,4 +157,11 @@
       scroll-behavior: smooth;
     }
   }
+}
+
+/* AnimatedThemeToggler: the clip-path reveal replaces the default cross-fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
